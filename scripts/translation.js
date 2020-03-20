@@ -92,18 +92,10 @@
 		if (!this.searchLang) {
 			this.searchLang = this.lang;
 		}
-		translationFile = this.rootPath + 'translations/' + this.lang + '.js';
-		$.getJSON(translationFile, function(data) {
-			// success!
-			thisObj.tt = data; 
-			deferred.resolve(); 
-		})
-		.fail(function() {
-			console.log( "Critical Error: Unable to load translation file:",translationFile);			
-			thisObj.provideFallback();
-			deferred.fail();
-		})
-		return deferred.promise();
+		translationFile = require("../translations/" + this.lang + ".js");
+    thisObj.tt = eval(translationFile);
+    deferred.resolve();
+    return deferred.promise();
 	};
 
 	AblePlayer.prototype.getSampleDescriptionText = function() {

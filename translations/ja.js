@@ -353,4 +353,5 @@
 "enableKeyboardShortcuts": "キーボード・ショートカットを有効にする"
 
 
-}
+};
+module.exports = ja;

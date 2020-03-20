@@ -352,4 +352,5 @@
 
 "enableKeyboardShortcuts": "Permettre les raccourcis clavier"
 
-}
+};
+module.exports = fr;

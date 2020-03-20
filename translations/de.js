@@ -352,4 +352,5 @@
 
 "enableKeyboardShortcuts": "Tastaturkürzel aktivieren"
 
-}
+};
+module.exports = de;

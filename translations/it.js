@@ -350,4 +350,5 @@
 
 "enableKeyboardShortcuts": "Enable keyboard shortcuts"
 
-}
+};
+module.exports = it;

@@ -352,4 +352,5 @@
 
 "enableKeyboardShortcuts": "Aktiver tastatursnarveier"
 
-}
+};
+module.exports = nb;
