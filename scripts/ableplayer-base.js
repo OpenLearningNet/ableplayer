@@ -31,6 +31,11 @@
 	// https://developer.mozilla.org/en-US/docs/Web/API/Window/speechSynthesis
 */
 
+// Add dependencies here so that including ableplayer in another
+// package.json, it comes with dependencies included
+var jQuery = require("jquery");
+var Cookies = require("js-cookie");
+
 /*jslint node: true, browser: true, white: true, indent: 2, unparam: true, plusplus: true */
 /*global $, jQuery */
 "use strict";
@@ -39,14 +44,15 @@
 var AblePlayerInstances = [];
 
 (function ($) {
-	$(function () {
-
-		$('video, audio').each(function (index, element) {
-			if ($(element).data('able-player') !== undefined) {
-				AblePlayerInstances.push(new AblePlayer($(this),$(element)));
-			}
-		});
-	});
+	// Initialise all AblePlayerInstances - this can be called
+	// by the React component that imports ableplayer
+  window.getAllAblePlayers = function() {
+    $("video, audio").each(function(index, element) {
+      if ($(element).data("able-player") !== undefined) {
+        AblePlayerInstances.push(new AblePlayer($(this), $(element)));
+      }
+    });
+  };
 
 	// YouTube player support; pass ready event to jQuery so we can catch in player.
 	window.onYouTubeIframeAPIReady = function() {
@@ -667,3 +673,8 @@ var AblePlayerInstances = [];
 	AblePlayer.youTubeIframeAPIReady = false;
 	AblePlayer.loadingYouTubeIframeAPI = false;
 })(jQuery);
+
+// Exports the creating of AblePlayer instances, as well as
+// the instances themselves
+exports.getAllAblePlayers = window.getAllAblePlayers;
+exports.ablePlayerInstances = AblePlayerInstances;
