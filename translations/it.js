@@ -124,7 +124,7 @@
 
 "alertNonDescribedVersion": "Sto usando la versione non audiodescritta di questo video",
 
-"fallbackError1": "Spiacente il tuo browser non � in grado di riprodurre questo",
+"fallbackError1": "Spiacente il tuo browser non è in grado di riprodurre questo",
 
 "fallbackError2": "I seguenti browser supportano questo lettore multimediale",
 
@@ -156,7 +156,7 @@
 
 "prefIntroDescription4": "Dopo aver salvato le tue impostazioni, le audiodescrizioni possono essere attivate o disattivate usando i pulsanti descrizione.",
 
-"prefIntroKeyboard1": "Il lettore multimediale pu� essere usato dovunque in questa pagina, attraverso la tastiera. Vedi sotto per un elenco di tasti di scelta rapida.",
+"prefIntroKeyboard1": "Il lettore multimediale può essere usato dovunque in questa pagina, attraverso la tastiera. Vedi sotto per un elenco di tasti di scelta rapida.",
 
 "prefIntroKeyboard2": "I tasti di scelta rapida, (Shift, Alt, e Control) possono essere assegnati di seguito.",
 
@@ -190,7 +190,7 @@
 
 "prefDescFormat": "Formato preferito",
 
-"prefDescFormatHelp": "Se entrambi i formati sono disponibili, ne verr� usato soltanto uno.",
+"prefDescFormatHelp": "Se entrambi i formati sono disponibili, ne verrà usato soltanto uno.",
 
 "prefDescFormatOption1": "Versione di descrizione alternativa per il video",
 
@@ -234,7 +234,7 @@
 
 "prefCaptionsSize": "Dimensione del carattere",
 
-"prefCaptionsOpacity": "Opacit�",
+"prefCaptionsOpacity": "Opacità",
 
 "prefCaptionsStyle": "Stile",
 
@@ -282,7 +282,7 @@
 
 "prefSuccess": "I cambiamenti sono stati salvati.",
 
-"prefNoChange": "Non � stato effettuato alcun cambiamento.",
+"prefNoChange": "Non è stato effettuato alcun cambiamento.",
 
 "help": "Aiuto",
 
@@ -318,7 +318,7 @@
 
 "windowSendBack": "Manda in fondo",
 
-"windowSendBackAlert": "Questa finestra � ora dietro agli altri oggetti della pagina.",
+"windowSendBackAlert": "Questa finestra è ora dietro agli altri oggetti della pagina.",
 
 "windowBringTop": "Metti in primo piano",
 
