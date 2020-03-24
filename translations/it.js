@@ -6,9 +6,9 @@
 
 "playerHeading": "Lettore multimediale",
 
-"faster": "Pi� veloce",
+"faster": "Più veloce",
 
-"slower": "Pi� lento",
+"slower": "Più lento",
 
 "play": "Riproduci",
 
@@ -80,7 +80,7 @@
 
 "fullscreen": "Schermo intero",
 
-"speed": "Velocit�",
+"speed": "Velocità",
 
 "and": "e",
 
