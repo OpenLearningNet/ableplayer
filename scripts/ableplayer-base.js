@@ -46,7 +46,7 @@ var AblePlayerInstances = [];
 (function ($) {
 	// Initialise all AblePlayerInstances - this can be called
 	// by the React component that imports ableplayer
-  window.getAllAblePlayers = function() {
+  window.initAllAblePlayers = function() {
     $("video, audio").each(function(index, element) {
       if ($(element).data("able-player") !== undefined) {
         AblePlayerInstances.push(new AblePlayer($(this), $(element)));
@@ -616,6 +616,7 @@ var AblePlayerInstances = [];
 		});
 	};
 
+
 	// Index to increment every time new player is created.
 	AblePlayer.nextIndex = 0;
 
@@ -676,6 +677,5 @@ var AblePlayerInstances = [];
 
 // Exports the creating of AblePlayer instances, which
 // needs to be called after a react component is mounted
-exports.getAllAblePlayers = window.getAllAblePlayers;
-//  Exports the instances created, for debugging purposes
-exports.ablePlayerInstances = AblePlayerInstances;
+exports.initAllAblePlayers = window.initAllAblePlayers;
+

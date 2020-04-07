@@ -46,7 +46,7 @@ var AblePlayerInstances = [];
 (function ($) {
 	// Initialise all AblePlayerInstances - this can be called
 	// by the React component that imports ableplayer
-  window.getAllAblePlayers = function() {
+  window.initAllAblePlayers = function() {
     $("video, audio").each(function(index, element) {
       if ($(element).data("able-player") !== undefined) {
         AblePlayerInstances.push(new AblePlayer($(this), $(element)));
@@ -616,6 +616,7 @@ var AblePlayerInstances = [];
 		});
 	};
 
+
 	// Index to increment every time new player is created.
 	AblePlayer.nextIndex = 0;
 
@@ -674,10 +675,10 @@ var AblePlayerInstances = [];
 	AblePlayer.loadingYouTubeIframeAPI = false;
 })(jQuery);
 
-// Exports the creating of AblePlayer instances, as well as
-// the instances themselves
-exports.getAllAblePlayers = window.getAllAblePlayers;
-exports.ablePlayerInstances = AblePlayerInstances;
+// Exports the creating of AblePlayer instances, which
+// needs to be called after a react component is mounted
+exports.initAllAblePlayers = window.initAllAblePlayers;
+
 
 (function ($) {
 	// Set default variable values.
@@ -698,6 +699,7 @@ exports.ablePlayerInstances = AblePlayerInstances;
 		this.setButtonImages();
 	};
 
+	// TODO: Remove later when we replaced all this.rootPath occurrances
 	AblePlayer.prototype.getRootPath = function() {
 		// no need to find root path from script tag anymore, just
 		// return 'ableplayer' (most probably won't need this anyway)
