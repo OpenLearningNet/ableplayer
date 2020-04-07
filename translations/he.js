@@ -1,4 +1,4 @@
-{
+exports.strings = {
 
 "audio": "שמע",
 
@@ -353,4 +353,3 @@
 "enableKeyboardShortcuts": "Enable keyboard shortcuts"
 
 };
-module.exports = he;

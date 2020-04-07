@@ -1,4 +1,4 @@
-{
+exports.strings = {
 
 "audio": "lyd",
 
@@ -353,4 +353,3 @@
 "enableKeyboardShortcuts": "Aktiver tastatursnarveier"
 
 };
-module.exports = nb;

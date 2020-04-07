@@ -1,4 +1,4 @@
-{
+exports.strings = {
 
 "audio": "オーディオ",
 
@@ -354,4 +354,3 @@
 
 
 };
-module.exports = ja;

@@ -1,4 +1,4 @@
-{
+exports.strings = {
 
 "audio": "audio",
 
@@ -353,4 +353,3 @@
 "enableKeyboardShortcuts": "Permettre les raccourcis clavier"
 
 };
-module.exports = fr;

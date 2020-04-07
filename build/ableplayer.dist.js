@@ -15289,10 +15289,11 @@ exports.AblePlayer = window.AblePlayer;
 		if (!this.searchLang) {
 			this.searchLang = this.lang;
 		}
-		translationFile = require("../translations/" + this.lang + ".js");
-    thisObj.tt = eval(translationFile);
-    deferred.resolve();
-    return deferred.promise();
+		import("../translations/" + this.lang + ".js").then(function (translationFile) {
+			thisObj.tt = translationFile.strings;
+			deferred.resolve();
+		});
+		return deferred.promise();
 	};
 
 	AblePlayer.prototype.getSampleDescriptionText = function() {

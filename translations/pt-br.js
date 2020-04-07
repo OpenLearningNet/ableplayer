@@ -1,4 +1,4 @@
-{
+exports.strings = {
 
 "audio": "áudio",
 
@@ -353,4 +353,3 @@
 "enableKeyboardShortcuts": "Ativar atalhos de teclado"
 
 };
-module.exports = pt-br;
