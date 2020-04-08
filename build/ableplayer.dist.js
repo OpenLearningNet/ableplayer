@@ -43,17 +43,16 @@ var Cookies = require("js-cookie");
 // maintain an array of Able Player instances for use globally (e.g., for keeping prefs in sync)
 var AblePlayerInstances = [];
 
-(function ($) {
-	// Initialise all AblePlayerInstances - this can be called
-	// by the React component that imports ableplayer
-  window.initAllAblePlayers = function() {
-    $("video, audio").each(function(index, element) {
-      if ($(element).data("able-player") !== undefined) {
-        AblePlayerInstances.push(new AblePlayer($(this), $(element)));
-      }
-    });
-  };
+// Initialise all AblePlayerInstances
+exports.initAllAblePlayers = function() {
+	$("video, audio").each(function(index, element) {
+		if ($(element).data("able-player") !== undefined) {
+			AblePlayerInstances.push(new AblePlayer($(this), $(element)));
+		}
+	});
+};
 
+(function ($) {
 	// YouTube player support; pass ready event to jQuery so we can catch in player.
 	window.onYouTubeIframeAPIReady = function() {
 		AblePlayer.youTubeIframeAPIReady = true;
