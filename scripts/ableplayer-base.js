@@ -663,5 +663,5 @@ exports.initAllAblePlayers = function () {
 	AblePlayer.loadingYouTubeIframeAPI = false;
 })(jQuery);
 
-// Exports AblePlayer construtor
+// Exports AblePlayer constructor
 exports.AblePlayer = window.AblePlayer;
