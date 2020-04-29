@@ -34,7 +34,7 @@
 // Add dependencies here so that including ableplayer in another
 // package.json, it comes with dependencies included
 var jQuery = require("jquery");
-var Cookies = require("js-cookie");
+
 
 /*jslint node: true, browser: true, white: true, indent: 2, unparam: true, plusplus: true */
 /*global $, jQuery */
@@ -44,8 +44,8 @@ var Cookies = require("js-cookie");
 var AblePlayerInstances = [];
 
 // Initialise all AblePlayerInstances
-exports.initAllAblePlayers = function() {
-	$("video, audio").each(function(index, element) {
+exports.initAllAblePlayers = function () {
+	$("video, audio").each(function (index, element) {
 		if ($(element).data("able-player") !== undefined) {
 			AblePlayerInstances.push(new AblePlayer($(this), $(element)));
 		}
@@ -54,7 +54,7 @@ exports.initAllAblePlayers = function() {
 
 (function ($) {
 	// YouTube player support; pass ready event to jQuery so we can catch in player.
-	window.onYouTubeIframeAPIReady = function() {
+	window.onYouTubeIframeAPIReady = function () {
 		AblePlayer.youTubeIframeAPIReady = true;
 		$('body').trigger('youTubeIframeAPIReady', []);
 	};
@@ -69,7 +69,7 @@ exports.initAllAblePlayers = function() {
 	// Construct an AblePlayer object
 	// Parameters are:
 	// media - jQuery selector or element identifying the media.
-	window.AblePlayer = function(media) {
+	window.AblePlayer = function (media) {
 
 
 		var thisObj = this;
@@ -610,7 +610,7 @@ exports.initAllAblePlayers = function() {
 	// Index to increment every time new player is created.
 	AblePlayer.nextIndex = 0;
 
-	AblePlayer.prototype.setup = function() {
+	AblePlayer.prototype.setup = function () {
 
 		var thisObj = this;
 		this.initializing = true; // will remain true until entire sequence of function calls is complete
@@ -648,14 +648,12 @@ exports.initAllAblePlayers = function() {
 		return activeElement;
 	};
 
-	AblePlayer.localGetElementById = function(element, id) {
-		if (element.getRootNode)
-		{
+	AblePlayer.localGetElementById = function (element, id) {
+		if (element.getRootNode) {
 			// Use getRootNode() and querySelector() where supported (for shadow DOM support)
 			return $(element.getRootNode().querySelector('#' + id));
 		}
-		else
-		{
+		else {
 			// If getRootNode is not supported it should be safe to use document.getElementById (since there is no shadow DOM support)
 			return $(document.getElementById(id));
 		}

@@ -1,4 +1,5 @@
 var jQuery = require("jquery");
+var Player = require("@vimeo/player");
 
 (function ($) {
 	AblePlayer.prototype.initVimeoPlayer = function () {
@@ -74,7 +75,7 @@ var jQuery = require("jquery");
 			}
 		}
 
-		this.vimeoPlayer = new Vimeo.Player(containerId, options);
+		this.vimeoPlayer = new Player.default(containerId, options);
 
 		this.vimeoPlayer.ready().then(function() {
 			// add tabindex -1 on iframe so vimeo frame cannot be focused on
@@ -113,10 +114,10 @@ var jQuery = require("jquery");
 				// Attempt to change the playbackRate. If it results in an error, assume changing playbackRate is not supported.
 				// Supported playbackRate values are 0.5 to 2.
 				thisObj.vimeoPlaybackRate = 1;
-				thisObj.vimeoPlayer.setPlaybackRate(thisObj.vimeoPlaybackRate).then(function(playbackRate) {
-				// playback rate was set
+				thisObj.vimeoPlayer.setPlaybackRate(thisObj.vimeoPlaybackRate).then(function (playbackRate) {
+					// playback rate was set
 					thisObj.vimeoSupportsPlaybackRateChange = true;
-				}).catch(function(error) {
+				}).catch(function (error) {
 					thisObj.vimeoSupportsPlaybackRateChange = false;
 				});
 				deferred.resolve();
@@ -193,18 +194,18 @@ var jQuery = require("jquery");
 
 		thisObj = this;
 
-		this.vimeoPlayer.getTextTracks().then(function(tracks) {
+		this.vimeoPlayer.getTextTracks().then(function (tracks) {
 
-				// each Vimeo track includes the following:
-				// label (local name of the language)
-				// language (2-character code)
-				// kind (captions or subtitles, as declared by video owner)
-				// mode ('disabled' or 'showing')
+			// each Vimeo track includes the following:
+			// label (local name of the language)
+			// language (2-character code)
+			// kind (captions or subtitles, as declared by video owner)
+			// mode ('disabled' or 'showing')
 
-				if (tracks.length) {
+			if (tracks.length) {
 
-					// create a new button for each caption track
-					for (i=0; i<tracks.length; i++) {
+				// create a new button for each caption track
+				for (i = 0; i < tracks.length; i++) {
 
 						thisObj.hasCaptions = true;
 						if (thisObj.prefCaptions === 1) {
