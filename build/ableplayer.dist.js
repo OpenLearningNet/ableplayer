@@ -1483,6 +1483,9 @@ var Cookies = require("js-cookie");
 	};
 
 	AblePlayer.prototype.initHtml5Player = function () {
+		// Commented this out for now, because not sure how to deal with merge conflicts.
+		// this.injectPoster(this.$mediaContainer, 'html5');
+		
 		// Nothing special to do!
 		var deferred = new $.Deferred();
 		var promise = deferred.promise();
@@ -3836,6 +3839,56 @@ var Cookies = require("js-cookie");
 		}
 		return position;
 	};
+
+	// Commented this out for now, because not sure how to deal with merge conflicts.
+	// AblePlayer.prototype.injectPoster = function ($element, context) {
+
+	// 	// get poster attribute from media element and append that as an img to $element
+	// 	// context is either 'youtube' or 'fallback'
+	// 	var poster, width, height;
+
+	// 	if (context === 'youtube') {
+	// 		if (typeof this.ytWidth !== 'undefined') {
+	// 			width = this.ytWidth;
+	// 			height = this.ytHeight;
+	// 		}
+	// 		else if (typeof this.playerMaxWidth !== 'undefined') {
+	// 			width = this.playerMaxWidth;
+	// 			height = this.playerMaxHeight;
+	// 		}
+	// 		else if (typeof this.playerWidth !== 'undefined') {
+	// 			width = this.playerWidth;
+	// 			height = this.playerHeight;
+	// 		}
+	// 	}
+	// 	else if (context === 'html5') {
+	// 		if (typeof this.playerMaxWidth !== 'undefined') {
+	// 			width = this.playerMaxWidth;
+	// 			height = this.playerMaxHeight;
+	// 		}
+	// 		else if (typeof this.playerWidth !== 'undefined') {
+	// 			width = this.playerWidth;
+	// 			height = this.playerHeight;
+	// 		}
+	// 	}
+	// 	else if (context === 'fallback') {
+	// 		width = '100%';
+	// 		height = 'auto';
+	// 	}
+
+	// 	if (this.hasPoster) {
+	// 		poster = this.$media.attr('poster');
+	// 		this.$posterImg = $('<img>',{
+	// 			'class': 'able-poster',
+	// 			'src' : poster,
+	// 			'alt' : "",
+	// 			'role': "presentation",
+	// 			'width': width,
+	// 			'height': height
+	// 		});
+	// 		$element.append(this.$posterImg);
+	// 	}
+	// };
 
 	AblePlayer.prototype.injectAlert = function () {
 
@@ -8424,6 +8477,12 @@ var Cookies = require("js-cookie");
 					this.signVideo.currentTime = this.startTime;
 				}
 			}
+
+			if (newTime > 0) {
+				if (typeof this.$posterImg !== 'undefined') {
+					this.$posterImg.hide();
+				}
+			}
 		}
 		else if (this.player === 'youtube') {
 			this.youTubePlayer.seekTo(newTime,true);
@@ -8782,6 +8841,9 @@ var Cookies = require("js-cookie");
 			this.media.play(true);
 			if (this.hasSignLanguage && this.signVideo) {
 				this.signVideo.play(true);
+			}
+			if (typeof this.$posterImg !== 'undefined') {
+				this.$posterImg.hide();
 			}
 		}
 		else if (this.player === 'youtube') {
