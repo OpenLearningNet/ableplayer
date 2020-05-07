@@ -348,6 +348,56 @@ var Cookies = require("js-cookie");
 		return position;
 	};
 
+	// Commented this out for now, because not sure how to deal with merge conflicts.
+	// AblePlayer.prototype.injectPoster = function ($element, context) {
+
+	// 	// get poster attribute from media element and append that as an img to $element
+	// 	// context is either 'youtube' or 'fallback'
+	// 	var poster, width, height;
+
+	// 	if (context === 'youtube') {
+	// 		if (typeof this.ytWidth !== 'undefined') {
+	// 			width = this.ytWidth;
+	// 			height = this.ytHeight;
+	// 		}
+	// 		else if (typeof this.playerMaxWidth !== 'undefined') {
+	// 			width = this.playerMaxWidth;
+	// 			height = this.playerMaxHeight;
+	// 		}
+	// 		else if (typeof this.playerWidth !== 'undefined') {
+	// 			width = this.playerWidth;
+	// 			height = this.playerHeight;
+	// 		}
+	// 	}
+	// 	else if (context === 'html5') {
+	// 		if (typeof this.playerMaxWidth !== 'undefined') {
+	// 			width = this.playerMaxWidth;
+	// 			height = this.playerMaxHeight;
+	// 		}
+	// 		else if (typeof this.playerWidth !== 'undefined') {
+	// 			width = this.playerWidth;
+	// 			height = this.playerHeight;
+	// 		}
+	// 	}
+	// 	else if (context === 'fallback') {
+	// 		width = '100%';
+	// 		height = 'auto';
+	// 	}
+
+	// 	if (this.hasPoster) {
+	// 		poster = this.$media.attr('poster');
+	// 		this.$posterImg = $('<img>',{
+	// 			'class': 'able-poster',
+	// 			'src' : poster,
+	// 			'alt' : "",
+	// 			'role': "presentation",
+	// 			'width': width,
+	// 			'height': height
+	// 		});
+	// 		$element.append(this.$posterImg);
+	// 	}
+	// };
+
 	AblePlayer.prototype.injectAlert = function () {
 
 		// inject two alerts, one visible for all users and one for screen reader users only

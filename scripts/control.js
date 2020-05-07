@@ -35,6 +35,12 @@ var Cookies = require("js-cookie");
 					this.signVideo.currentTime = this.startTime;
 				}
 			}
+
+			if (newTime > 0) {
+				if (typeof this.$posterImg !== 'undefined') {
+					this.$posterImg.hide();
+				}
+			}
 		}
 		else if (this.player === 'youtube') {
 			this.youTubePlayer.seekTo(newTime,true);
@@ -393,6 +399,9 @@ var Cookies = require("js-cookie");
 			this.media.play(true);
 			if (this.hasSignLanguage && this.signVideo) {
 				this.signVideo.play(true);
+			}
+			if (typeof this.$posterImg !== 'undefined') {
+				this.$posterImg.hide();
 			}
 		}
 		else if (this.player === 'youtube') {

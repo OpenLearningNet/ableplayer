@@ -815,6 +815,9 @@ var Cookies = require("js-cookie");
 	};
 
 	AblePlayer.prototype.initHtml5Player = function () {
+		// Commented this out for now, because not sure how to deal with merge conflicts.
+		// this.injectPoster(this.$mediaContainer, 'html5');
+		
 		// Nothing special to do!
 		var deferred = new $.Deferred();
 		var promise = deferred.promise();
