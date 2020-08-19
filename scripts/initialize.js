@@ -613,7 +613,9 @@ var Cookies = require("js-cookie");
 							  thisObj.refreshControls('init');
 						  },100);
 			});
-			thisObj.onLoaded();
+			if (thisObj.onLoaded) {
+				thisObj.onLoaded();
+			}
 					},
 					function() {	 // initPlayer fail
 						thisObj.provideFallback();
