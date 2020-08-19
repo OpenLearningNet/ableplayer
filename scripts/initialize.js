@@ -612,7 +612,10 @@ var Cookies = require("js-cookie");
               setTimeout(function() {
 							  thisObj.refreshControls('init');
 						  },100);
-            });
+			});
+			if (thisObj.onLoaded) {
+				thisObj.onLoaded();
+			}
 					},
 					function() {	 // initPlayer fail
 						thisObj.provideFallback();

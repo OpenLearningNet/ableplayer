@@ -68,10 +68,16 @@ exports.initAllAblePlayers = function () {
 	// Construct an AblePlayer object
 	// Parameters are:
 	// media - jQuery selector or element identifying the media.
-	window.AblePlayer = function (media) {
+	window.AblePlayer = function (media, options) {
 		// Keep track of the last player created for use with global events.
 		AblePlayer.lastCreated = this;
 		this.media = media;
+		// callback function to notify outside world that AblePlayer is fully loaded (Herbie style)
+		// how do you define "fully loaded??"
+		if (options && options.onLoaded) {
+			this.onLoaded = options.onLoaded;
+		}
+
 		if ($(media).length === 0) {
 			this.provideFallback();
 			return;
@@ -1173,7 +1179,10 @@ var Cookies = require("js-cookie");
               setTimeout(function() {
 							  thisObj.refreshControls('init');
 						  },100);
-            });
+			});
+			if (thisObj.onLoaded) {
+				thisObj.onLoaded();
+			}
 					},
 					function() {	 // initPlayer fail
 						thisObj.provideFallback();
