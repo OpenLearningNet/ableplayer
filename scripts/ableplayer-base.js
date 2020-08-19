@@ -68,13 +68,15 @@ exports.initAllAblePlayers = function () {
 	// Construct an AblePlayer object
 	// Parameters are:
 	// media - jQuery selector or element identifying the media.
-	window.AblePlayer = function (media, onLoaded) {
+	window.AblePlayer = function (media, options) {
 		// Keep track of the last player created for use with global events.
 		AblePlayer.lastCreated = this;
 		this.media = media;
 		// callback function to notify outside world that AblePlayer is fully loaded (Herbie style)
 		// how do you define "fully loaded??"
-		this.onLoaded = onLoaded;
+		if (options && options.onLoaded) {
+			this.onLoaded = options.onLoaded;
+		}
 
 		if ($(media).length === 0) {
 			this.provideFallback();
