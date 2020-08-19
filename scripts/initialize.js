@@ -621,6 +621,7 @@ var Cookies = require("js-cookie");
 										deferred.resolve(); 
 									},100);								
 								}); 
+								thisObj.onLoaded();
 							}); 
 						});
 					});
