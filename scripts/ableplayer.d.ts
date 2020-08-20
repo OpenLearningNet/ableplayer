@@ -4,7 +4,7 @@ declare module 'ableplayer' {
 	}
 
 	export class AblePlayer{
-		constructor(media: HTMLVideoElement | null, options: AblePlayerOptions);
+		constructor(media: HTMLVideoElement | null, options: AblePlayerOptions | null);
 		getDuration(): Promise<number>;
 	}
 }
