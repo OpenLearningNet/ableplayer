@@ -1239,7 +1239,13 @@ button#able-vts-save:focus {
 /*
   SVG Icons
 */
-div[role="button"] svg {
+div.able-left-controls > div[role="button"] svg {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	fill: currentColor;
+}
+div.able-right-controls > div[role="button"] svg {
 	display: inline-block;
 	width: 1em;
 	height: 1em;
