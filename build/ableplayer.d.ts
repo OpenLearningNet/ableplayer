@@ -1,6 +1,7 @@
 declare module 'ableplayer' {
 	interface AblePlayerOptions {
-		onLoaded: () => void;
+		onLoaded?: () => void;
+		onPlay?: () => void;
 	}
 
 	export class AblePlayer{
