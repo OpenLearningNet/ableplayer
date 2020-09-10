@@ -421,6 +421,10 @@ var Cookies = require("js-cookie");
 			this.hidingControls = true;
 			this.invokeHideControlsTimeout();
 		}
+		if (this.onPlay) {
+			// notify outside world ableplayer started playing
+			this.onPlay()
+		}
 	};
 
 	AblePlayer.prototype.fadeControls = function(direction) {
