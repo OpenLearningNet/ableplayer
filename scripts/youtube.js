@@ -145,6 +145,9 @@ var Cookies = require("js-cookie");
 							thisObj.playing = true;
 							thisObj.startedPlaying = true;
 							thisObj.paused = false;
+							if(thisObj.onPlay){
+								thisObj.onPlay()
+							}
 						}
 						else if (playerState == 'ended') {
 							thisObj.onMediaComplete();
