@@ -15424,15 +15424,11 @@ var jQuery = require("jquery");
 
 		this.sampleText = []; 
 		for (i=0; i < supportedLangs.length; i++) { 
-			translationFile = require('../translations/' + supportedLangs[i] + '.js');
-			$.getJSON(translationFile, thisLang, (function(thisLang) {
-					return function(data) { 
-						thisText = data.sampleDescriptionText; 
-						translation = {'lang':thisLang, 'text': thisText}; 
-						thisObj.sampleText.push(translation); 						
-					};
-			}(supportedLangs[i])) // pass lang to callback function 
-			); 				 
+			import("../translations/" + supportedLangs[i] + ".js").then(function (translationFile) {
+				thisText = translationFile.strings.sampleDescriptionText;
+				translation = {'lang':supportedLangs[i], 'text': thisText}; 
+				thisObj.sampleText.push(translation); 						
+			});
 		}
 	};
 
