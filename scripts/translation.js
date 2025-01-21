@@ -114,7 +114,7 @@ var jQuery = require("jquery");
 
 		this.sampleText = []; 
 		for (i=0; i < supportedLangs.length; i++) { 
-			translationFile = this.rootPath + 'translations/' + supportedLangs[i] + '.js';
+			translationFile = require('../translations/' + supportedLangs[i] + '.js');
 			$.getJSON(translationFile, thisLang, (function(thisLang) {
 					return function(data) { 
 						thisText = data.sampleDescriptionText; 

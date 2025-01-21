@@ -1,4 +1,4 @@
-{
+exports.strings = {
 
 "audio": "áudio",
 
