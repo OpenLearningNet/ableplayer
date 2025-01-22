@@ -168,7 +168,7 @@ var Cookies = require("js-cookie");
 					// This is the most reliable event on which to unload the caption module 
 					if (thisObj.player === 'youtube' && !thisObj.usingYouTubeCaptions) { 						
 						if (thisObj.youTubePlayer.getOptions('captions')) { 							
-							// thisObj.youTubePlayer.unloadModule('captions');
+							thisObj.youTubePlayer.unloadModule('captions');
 						}
 					}			 			
 				},

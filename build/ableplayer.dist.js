@@ -6339,7 +6339,7 @@ var Cookies = require("js-cookie");
 					// This is the most reliable event on which to unload the caption module 
 					if (thisObj.player === 'youtube' && !thisObj.usingYouTubeCaptions) { 						
 						if (thisObj.youTubePlayer.getOptions('captions')) { 							
-							// thisObj.youTubePlayer.unloadModule('captions');
+							thisObj.youTubePlayer.unloadModule('captions');
 						}
 					}			 			
 				},
@@ -15565,9 +15565,13 @@ var translationFiles = {
 		if (!this.searchLang) {
 			this.searchLang = this.lang;
 		}
+
 		translationFile = this.getTranslationFile();
 		this.tt = translationFile.strings;
-		deferred.resolve();
+		// resolve after 1 second, regardless of whether the translation file has been loaded
+		setTimeout(function() {
+			deferred.resolve();
+		}, 1000);
 		
 		return deferred.promise();
 	};
