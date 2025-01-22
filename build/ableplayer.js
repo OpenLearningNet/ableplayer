@@ -829,12 +829,6 @@ var icons = {
 			return g[1].toUpperCase();
 		});
 
-		console.log({
-			iconName,
-			color,
-			icon: this.icons[iconName]
-		})
-
 		if (this.icons[iconName] === undefined) {
 			return '';
 		}
@@ -897,8 +891,8 @@ var icons = {
 	AblePlayer.prototype.setButtonImages = function() {
 
 		// NOTE: volume button images are now set dynamically within volume.js
-		this.playButtonImg = this.getIcon('play');
-		this.pauseButtonImg = this.getIcon('pause');
+		this.playButtonImg = this.icons.play.black;
+		this.pauseButtonImg = this.icons.pause.black;
 		this.restartButtonImg = this.getIcon('restart');
 		this.rewindButtonImg = this.getIcon('rewind');
 		this.forwardButtonImg = this.getIcon('forward');
