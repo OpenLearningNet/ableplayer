@@ -816,7 +816,7 @@ var icons = {
 	};
 
 	AblePlayer.prototype.getIcon = function (icon, type) {
-		color = 'black';
+		var color = 'black';
 
 		if (type === 'toolbar') {
 			color = this.toolbarIconColor;
@@ -825,7 +825,7 @@ var icons = {
 		}
 
 		// Convert kebab-case to camelCase when necessary
-		iconName = icon.replace(/-([a-z])/g, function (g) {
+		var iconName = icon.replace(/-([a-z])/g, function (g) {
 			return g[1].toUpperCase();
 		});
 
