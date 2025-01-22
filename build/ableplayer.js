@@ -4747,8 +4747,8 @@ var Cookies = require("js-cookie");
 						$pipe.addClass('icon-pipe');
 					}
 					else {
-						console.log("!!!!!");
 						var pipeIcon = this.getIcon('pipe');
+						alert(JSON.stringify(pipeIcon));
 						$pipeImg = $('<img>', {
 							src: pipeIcon,
 							alt: '',
