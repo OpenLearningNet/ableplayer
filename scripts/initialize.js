@@ -136,8 +136,6 @@ var icons = {
 	};
 
 	AblePlayer.prototype.getIcon = function (icon, type) {
-		return require('../button-icons/white/stop.png');
-		
 		var color = 'black';
 
 		if (type === 'toolbar') {
@@ -152,7 +150,7 @@ var icons = {
 		});
 
 		if (this.icons[iconName] === undefined) {
-			return require('../button-icons/white/stop.png');
+			return '';
 		}
 
 		return this.icons[iconName][color];
@@ -213,8 +211,8 @@ var icons = {
 	AblePlayer.prototype.setButtonImages = function() {
 
 		// NOTE: volume button images are now set dynamically within volume.js
-		this.playButtonImg = this.icons.play.black;
-		this.pauseButtonImg = this.icons.pause.black;
+		this.playButtonImg = this.getIcon('play');
+		this.pauseButtonImg = this.getIcon('pause');
 		this.restartButtonImg = this.getIcon('restart');
 		this.rewindButtonImg = this.getIcon('rewind');
 		this.forwardButtonImg = this.getIcon('forward');
