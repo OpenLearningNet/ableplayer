@@ -149,6 +149,12 @@ var icons = {
 			return g[1].toUpperCase();
 		});
 
+		console.log({
+			iconName,
+			color,
+			icon: this.icons[iconName]
+		})
+
 		if (this.icons[iconName] === undefined) {
 			return '';
 		}
