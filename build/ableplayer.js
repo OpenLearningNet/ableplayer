@@ -833,7 +833,7 @@ var icons = {
 			return '';
 		}
 
-		return this.icons[iconName][color];
+		return this.icons[iconName][color].default;
 	};
 
 	AblePlayer.prototype.setIconColor = function() {
