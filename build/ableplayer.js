@@ -681,125 +681,123 @@ exports.AblePlayer = window.AblePlayer;
 var jQuery = require("jquery");
 var Cookies = require("js-cookie");
 var icons = {
-	volumeSoft: {
-			white: require('../button-icons/white/volume-soft.png'),
-			black: require('../button-icons/black/volume-soft.png')
-	},
-	volumeMute: {
-			white: require('../button-icons/white/volume-mute.png'),
-			black: require('../button-icons/black/volume-mute.png')
-	},
-	volumeMedium: {
-			white: require('../button-icons/white/volume-medium.png'),
-			black: require('../button-icons/black/volume-medium.png')
-	},
-	volumeLoud: {
-			white: require('../button-icons/white/volume-loud.png'),
-			black: require('../button-icons/black/volume-loud.png')
-	},
-	turtle: {
-			white: require('../button-icons/white/turtle.png'),
-			black: require('../button-icons/black/turtle.png')
-	},
-	transcript: {
-			white: require('../button-icons/white/transcript.png'),
-			black: require('../button-icons/black/transcript.png')
-	},
-	stop: {
-			white: require('../button-icons/white/stop.png'),
-			black: require('../button-icons/black/stop.png')
-	},
-	slower: {
-			white: require('../button-icons/white/slower.png'),
-			black: require('../button-icons/black/slower.png')
-	},
-	sign: {
-			white: require('../button-icons/white/sign.png'),
-			black: require('../button-icons/black/sign.png')
-	},
-	rewind: {
-			white: require('../button-icons/white/rewind.png'),
-			black: require('../button-icons/black/rewind.png')
-	},
-	restart: {
-			white: require('../button-icons/white/restart.png'),
-			black: require('../button-icons/black/restart.png')
-	},
-	rabbit: {
-			white: require('../button-icons/white/rabbit.png'),
-			black: require('../button-icons/black/rabbit.png')
-	},
-	previous: {
-			white: require('../button-icons/white/previous.png'),
-			black: require('../button-icons/black/previous.png')
-	},
-	preferences: {
-			white: require('../button-icons/white/preferences.png'),
-			black: require('../button-icons/black/preferences.png')
-	},
-	play: {
-			white: require('../button-icons/white/play.png'),
-			black: require('../button-icons/black/play.png')
-	},
-	pipe: {
-			white: require('../button-icons/white/pipe.png'),
-			black: require('../button-icons/black/pipe.png')
-	},
-	pause: {
-			white: require('../button-icons/white/pause.png'),
-			black: require('../button-icons/black/pause.png')
-	},
-	next: {
-			white: require('../button-icons/white/next.png'),
-			black: require('../button-icons/black/next.png')
-	},
-	help: {
-			white: require('../button-icons/white/help.png'),
-			black: require('../button-icons/black/help.png')
-	},
-	fullscreenExpand: {
-			white: require('../button-icons/white/fullscreen-expand.png'),
-			black: require('../button-icons/black/fullscreen-expand.png')
-	},
-	fullscreenCollapse: {
-			white: require('../button-icons/white/fullscreen-collapse.png'),
-			black: require('../button-icons/black/fullscreen-collapse.png')
-	},
-	forward: {
-			white: require('../button-icons/white/forward.png'),
-			black: require('../button-icons/black/forward.png')
-	},
-	faster: {
-			white: require('../button-icons/white/faster.png'),
-			black: require('../button-icons/black/faster.png')
-	},
-	ellipsis: {
-			white: require('../button-icons/white/ellipsis.png'),
-			black: require('../button-icons/black/ellipsis.png')
-	},
-	descriptions: {
-			white: require('../button-icons/white/descriptions.png'),
-			black: require('../button-icons/black/descriptions.png')
-	},
-	close: {
-			white: require('../button-icons/white/close.png'),
-			black: require('../button-icons/black/close.png')
-	},
-	chapters: {
-			white: require('../button-icons/white/chapters.png'),
-			black: require('../button-icons/black/chapters.png')
-	},
-	captions: {
-			white: require('../button-icons/white/captions.png'),
-			black: require('../button-icons/black/captions.png')
-	}
+  "volume-soft": {
+    white: require('../button-icons/white/volume-soft.png'),
+    black: require('../button-icons/black/volume-soft.png')
+  },
+  'volume-mute': {
+    white: require('../button-icons/white/volume-mute.png'),
+    black: require('../button-icons/black/volume-mute.png')
+  },
+  'volume-medium': {
+    white: require('../button-icons/white/volume-medium.png'),
+    black: require('../button-icons/black/volume-medium.png')
+  },
+  'volume-loud': {
+    white: require('../button-icons/white/volume-loud.png'),
+    black: require('../button-icons/black/volume-loud.png')
+  },
+  turtle: {
+    white: require('../button-icons/white/turtle.png'),
+    black: require('../button-icons/black/turtle.png')
+  },
+  transcript: {
+    white: require('../button-icons/white/transcript.png'),
+    black: require('../button-icons/black/transcript.png')
+  },
+  stop: {
+    white: require('../button-icons/white/stop.png'),
+    black: require('../button-icons/black/stop.png')
+  },
+  slower: {
+    white: require('../button-icons/white/slower.png'),
+    black: require('../button-icons/black/slower.png')
+  },
+  sign: {
+    white: require('../button-icons/white/sign.png'),
+    black: require('../button-icons/black/sign.png')
+  },
+  rewind: {
+    white: require('../button-icons/white/rewind.png'),
+    black: require('../button-icons/black/rewind.png')
+  },
+  restart: {
+    white: require('../button-icons/white/restart.png'),
+    black: require('../button-icons/black/restart.png')
+  },
+  rabbit: {
+    white: require('../button-icons/white/rabbit.png'),
+    black: require('../button-icons/black/rabbit.png')
+  },
+  previous: {
+    white: require('../button-icons/white/previous.png'),
+    black: require('../button-icons/black/previous.png')
+  },
+  preferences: {
+    white: require('../button-icons/white/preferences.png'),
+    black: require('../button-icons/black/preferences.png')
+  },
+  play: {
+    white: require('../button-icons/white/play.png'),
+    black: require('../button-icons/black/play.png')
+  },
+  pipe: {
+    white: require('../button-icons/white/pipe.png'),
+    black: require('../button-icons/black/pipe.png')
+  },
+  pause: {
+    white: require('../button-icons/white/pause.png'),
+    black: require('../button-icons/black/pause.png')
+  },
+  next: {
+    white: require('../button-icons/white/next.png'),
+    black: require('../button-icons/black/next.png')
+  },
+  help: {
+    white: require('../button-icons/white/help.png'),
+    black: require('../button-icons/black/help.png')
+  },
+  'fullscreen-expand': {
+    white: require('../button-icons/white/fullscreen-expand.png'),
+    black: require('../button-icons/black/fullscreen-expand.png')
+  },
+  'fullscreen-collapse': {
+    white: require('../button-icons/white/fullscreen-collapse.png'),
+    black: require('../button-icons/black/fullscreen-collapse.png')
+  },
+  forward: {
+    white: require('../button-icons/white/forward.png'),
+    black: require('../button-icons/black/forward.png')
+  },
+  faster: {
+    white: require('../button-icons/white/faster.png'),
+    black: require('../button-icons/black/faster.png')
+  },
+  ellipsis: {
+    white: require('../button-icons/white/ellipsis.png'),
+    black: require('../button-icons/black/ellipsis.png')
+  },
+  descriptions: {
+    white: require('../button-icons/white/descriptions.png'),
+    black: require('../button-icons/black/descriptions.png')
+  },
+  close: {
+    white: require('../button-icons/white/close.png'),
+    black: require('../button-icons/black/close.png')
+  },
+  chapters: {
+    white: require('../button-icons/white/chapters.png'),
+    black: require('../button-icons/black/chapters.png')
+  },
+  captions: {
+    white: require('../button-icons/white/captions.png'),
+    black: require('../button-icons/black/captions.png')
+  }
 };
 
 (function ($) {
 	// Set default variable values.
 	AblePlayer.prototype.setDefaults = function () {
-		this.icons = icons;
-
 		this.playerCreated = false; // will set to true after recreatePlayer() is complete the first time
 		this.playing = false; // will change to true after 'playing' event is triggered
 		this.paused = true; // will always be the opposite of this.playing (available for convenience)
@@ -824,16 +822,11 @@ var icons = {
 			color = this.iconColor;
 		}
 
-		// Convert kebab-case to camelCase when necessary
-		var iconName = icon.replace(/-([a-z])/g, function (g) {
-			return g[1].toUpperCase();
-		});
-
-		if (this.icons[iconName] === undefined) {
+		if (icons[icon] === undefined) {
 			return '';
 		}
 
-		return this.icons[iconName][color].default;
+		return icons[icon][color].default;
 	};
 
 	AblePlayer.prototype.setIconColor = function() {
@@ -4748,7 +4741,6 @@ var Cookies = require("js-cookie");
 					}
 					else {
 						var pipeIcon = this.getIcon('pipe');
-						alert(JSON.stringify(pipeIcon));
 						$pipeImg = $('<img>', {
 							src: pipeIcon,
 							alt: '',
@@ -15473,7 +15465,6 @@ var translationFiles = {
 		// returns the translation file for the specified language
 		var lang = language || this.lang;
 		if (lang && translationFiles[lang]) {
-			alert('lang: ' + lang, 'translationFiles: ' + translationFiles[lang]);
 			return translationFiles[lang];
 		}
 		else {
@@ -15588,11 +15579,6 @@ var translationFiles = {
 
 		this.sampleText = []; 
 		for (i=0; i < supportedLangs.length; i++) { 
-			// import("../translations/" + supportedLangs[i] + ".js").then(function (translationFile) {
-			// 	thisText = translationFile.strings.sampleDescriptionText;
-			// 	translation = {'lang':supportedLangs[i], 'text': thisText}; 
-			// 	thisObj.sampleText.push(translation); 						
-			// });
 			translationFile = this.getTranslationFile(supportedLangs[i]);
 			thisText = translationFile.strings.sampleDescriptionText;
 			translation = {'lang':supportedLangs[i], 'text': thisText};

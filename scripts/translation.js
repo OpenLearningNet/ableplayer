@@ -31,7 +31,6 @@ var translationFiles = {
 		// returns the translation file for the specified language
 		var lang = language || this.lang;
 		if (lang && translationFiles[lang]) {
-			alert('lang: ' + lang, 'translationFiles: ' + translationFiles[lang]);
 			return translationFiles[lang];
 		}
 		else {
@@ -146,11 +145,6 @@ var translationFiles = {
 
 		this.sampleText = []; 
 		for (i=0; i < supportedLangs.length; i++) { 
-			// import("../translations/" + supportedLangs[i] + ".js").then(function (translationFile) {
-			// 	thisText = translationFile.strings.sampleDescriptionText;
-			// 	translation = {'lang':supportedLangs[i], 'text': thisText}; 
-			// 	thisObj.sampleText.push(translation); 						
-			// });
 			translationFile = this.getTranslationFile(supportedLangs[i]);
 			thisText = translationFile.strings.sampleDescriptionText;
 			translation = {'lang':supportedLangs[i], 'text': thisText};
