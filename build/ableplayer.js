@@ -4748,7 +4748,6 @@ var Cookies = require("js-cookie");
 					}
 					else {
 						var pipeIcon = this.getIcon('pipe');
-						console.log('pipe', pipeIcon);
 						$pipeImg = $('<img>', {
 							src: pipeIcon,
 							alt: '',
@@ -4764,7 +4763,7 @@ var Cookies = require("js-cookie");
 						buttonImgSrc = this.getIcon(this.volumeButton);
 					}
 					else if (control === 'fullscreen') {
-						buttonImgSrc = this.getIcon('fullscreen-expand');
+						buttonImgSrc = this.getIcon('pipe');
 					}
 					else if (control === 'slower') {
 						if (this.speedIcons === 'animals') {
