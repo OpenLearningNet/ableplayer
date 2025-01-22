@@ -15458,7 +15458,7 @@ var translationFiles = {
 	"sv": require("../translations/sv.js"),
 	"tr": require("../translations/tr.js"),
 	"zh-tw": require("../translations/zh-tw.js")
-}
+};
 
 (function ($) {
 	AblePlayer.prototype.getSupportedLangs = function() {
