@@ -4748,6 +4748,7 @@ var Cookies = require("js-cookie");
 					}
 					else {
 						
+						var pipeIcon = this.getIcon('pipe');
 						$pipeImg = $('<img>', {
 							src: pipeIcon,
 							alt: '',
