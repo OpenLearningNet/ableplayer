@@ -15439,6 +15439,26 @@ var jQuery = require("jquery");
 
 })(jQuery);
 var jQuery = require("jquery");
+var translationFiles = {
+	"ca": require("../translations/ca.js"),
+	"cs": require("../translations/cs.js"),
+	"da": require("../translations/da.js"),
+	"de": require("../translations/de.js"),
+	"en": require("../translations/en.js"),
+	"es": require("../translations/es.js"),
+	"fr": require("../translations/fr.js"),
+	"he": require("../translations/he.js"),
+	"id": require("../translations/id.js"),
+	"it": require("../translations/it.js"),
+	"ja": require("../translations/ja.js"),
+	"nb": require("../translations/nb.js"),
+	"nl": require("../translations/nl.js"),
+	"pt": require("../translations/pt.js"),
+	"pt-br": require("../translations/pt-br.js"),
+	"sv": require("../translations/sv.js"),
+	"tr": require("../translations/tr.js"),
+	"zh-tw": require("../translations/zh-tw.js")
+}
 
 (function ($) {
 	AblePlayer.prototype.getSupportedLangs = function() {
@@ -15446,6 +15466,17 @@ var jQuery = require("jquery");
 		var langs = ['ca','cs','da','de','en','es','fr','he','id','it','ja','nb','nl','pt','pt-br','sv','tr','zh-tw'];
 		return langs;
 	};
+
+	AblePlayer.prototype.getTranslationFile = function(language) {
+		// returns the translation file for the specified language
+		var lang = language || this.lang;
+		if (lang && translationFiles[lang]) {
+			return translationFiles[lang];
+		}
+		else {
+			return translationFiles['en'];
+		}
+	}
 
 	AblePlayer.prototype.getTranslationText = function() {
 
@@ -15534,10 +15565,10 @@ var jQuery = require("jquery");
 		if (!this.searchLang) {
 			this.searchLang = this.lang;
 		}
-		import("../translations/" + this.lang + ".js").then(function (translationFile) {
-			thisObj.tt = translationFile.strings;
-			deferred.resolve();
-		});
+		translationFile = this.getTranslationFile();
+		this.tt = translationFile.strings;
+		deferred.resolve();
+		
 		return deferred.promise();
 	};
 
@@ -15548,17 +15579,21 @@ var jQuery = require("jquery");
 		// in the Description Preferences dialog 
 		var thisObj, supportedLangs, i, thisLang, translationFile, thisText, translation; 
 		
-		supportedLangs = this.getSupportedLangs(); 
+		supportedLangs = this.getSupportedLangs() 
 
 		thisObj = this; 
 
 		this.sampleText = []; 
 		for (i=0; i < supportedLangs.length; i++) { 
-			import("../translations/" + supportedLangs[i] + ".js").then(function (translationFile) {
-				thisText = translationFile.strings.sampleDescriptionText;
-				translation = {'lang':supportedLangs[i], 'text': thisText}; 
-				thisObj.sampleText.push(translation); 						
-			});
+			// import("../translations/" + supportedLangs[i] + ".js").then(function (translationFile) {
+			// 	thisText = translationFile.strings.sampleDescriptionText;
+			// 	translation = {'lang':supportedLangs[i], 'text': thisText}; 
+			// 	thisObj.sampleText.push(translation); 						
+			// });
+			translationFile = this.getTranslationFile(supportedLangs[i]);
+			thisText = translationFile.strings.sampleDescriptionText;
+			translation = {'lang':supportedLangs[i], 'text': thisText};
+			thisObj.sampleText.push(translation);
 		}
 	};
 
