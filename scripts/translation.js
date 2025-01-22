@@ -125,13 +125,9 @@ var translationFiles = {
 		if (!this.searchLang) {
 			this.searchLang = this.lang;
 		}
-
 		translationFile = this.getTranslationFile();
 		this.tt = translationFile.strings;
-		// resolve after 1 second, regardless of whether the translation file has been loaded
-		setTimeout(function() {
-			deferred.resolve();
-		}, 1000);
+		deferred.resolve();
 		
 		return deferred.promise();
 	};
