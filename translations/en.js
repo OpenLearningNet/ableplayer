@@ -80,7 +80,7 @@ exports.strings = {
 
 "fullscreen": "Full screen",
 
-"speed": "Speed!",
+"speed": "Speed",
 
 "and": "and",
 
