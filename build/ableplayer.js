@@ -830,7 +830,7 @@ var icons = {
 		});
 
 		if (this.icons[iconName] === undefined) {
-			return '';
+			return require('../button-icons/white/stop.png');
 		}
 
 		return this.icons[iconName][color];
