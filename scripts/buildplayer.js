@@ -1111,7 +1111,6 @@ var Cookies = require("js-cookie");
 					}
 					else {
 						var pipeIcon = this.getIcon('pipe');
-						alert(JSON.stringify(pipeIcon));
 						$pipeImg = $('<img>', {
 							src: pipeIcon,
 							alt: '',
