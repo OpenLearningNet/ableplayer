@@ -1110,8 +1110,10 @@ var Cookies = require("js-cookie");
 						$pipe.addClass('icon-pipe');
 					}
 					else {
+						var pipeIcon = this.getIcon('pipe');
+						console.log('pipe', pipeIcon);
 						$pipeImg = $('<img>', {
-							src: this.getIcon('pipe'),
+							src: pipeIcon,
 							alt: '',
 							role: 'presentation'
 						});
