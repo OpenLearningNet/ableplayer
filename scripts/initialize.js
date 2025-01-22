@@ -136,6 +136,8 @@ var icons = {
 	};
 
 	AblePlayer.prototype.getIcon = function (icon, type) {
+		return require('../button-icons/white/stop.png');
+		
 		var color = 'black';
 
 		if (type === 'toolbar') {
