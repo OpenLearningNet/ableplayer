@@ -31,6 +31,7 @@ var translationFiles = {
 		// returns the translation file for the specified language
 		var lang = language || this.lang;
 		if (lang && translationFiles[lang]) {
+			alert('lang: ' + lang, 'translationFiles: ' + translationFiles[lang]);
 			return translationFiles[lang];
 		}
 		else {
