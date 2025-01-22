@@ -185,7 +185,7 @@ var Cookies = require("js-cookie");
 		}
 		else {
 			// use image
-			buttonImgSrc = require('../button-icons/' + this.toolbarIconColor + '/preferences.png');
+			buttonImagSrc = this.getIcon('preferences', 'toolbar');
 			$buttonImg = $('<img>',{
 				'src': buttonImgSrc,
 				'alt': '',
