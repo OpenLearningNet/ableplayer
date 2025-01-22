@@ -1111,7 +1111,7 @@ var Cookies = require("js-cookie");
 					}
 					else {
 						$pipeImg = $('<img>', {
-							src: require('../button-icons/' +  this.iconColor + '/pipe.png'),
+							src: this.getIcon('pipe'),
 							alt: '',
 							role: 'presentation'
 						});
@@ -1122,29 +1122,29 @@ var Cookies = require("js-cookie");
 				else {
 					// this control is a button
 					if (control === 'volume') {
-						buttonImgSrc = require('../button-icons/' + this.iconColor + '/' + this.volumeButton + '.png');
+						buttonImgSrc = this.getIcon(this.volumeButton);
 					}
 					else if (control === 'fullscreen') {
-						buttonImgSrc = require('../button-icons/' + this.iconColor + '/fullscreen-expand.png');
+						buttonImgSrc = this.getIcon('fullscreen-expand');
 					}
 					else if (control === 'slower') {
 						if (this.speedIcons === 'animals') {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/turtle.png');
+							buttonImgSrc = this.getIcon('turtle');
 						}
 						else {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/slower.png');
+							buttonImgSrc = this.getIcon('slower');
 						}
 					}
 					else if (control === 'faster') {
 						if (this.speedIcons === 'animals') {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/rabbit.png');
+							buttonImgSrc = this.getIcon('rabbit');
 						}
 						else {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/faster.png');
+							buttonImgSrc = this.getIcon('faster');
 						}
 					}
 					else {
-						buttonImgSrc = require('../button-icons/' + this.iconColor + '/' + control + '.png');
+						buttonImgSrc = this.getIcon(control);
 					}
 					buttonTitle = this.getButtonTitle(control);
 
