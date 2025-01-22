@@ -829,7 +829,7 @@ var icons = {
 			return g[1].toUpperCase();
 		});
 
-		if (this.icons[iconName] === undefined) {
+		{
 			return '';
 		}
 
