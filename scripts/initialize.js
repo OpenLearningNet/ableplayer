@@ -136,7 +136,7 @@ var icons = {
 	};
 
 	AblePlayer.prototype.getIcon = function (icon, type) {
-		var color = 'black';
+		var color = 'white';
 
 		if (type === 'toolbar') {
 			color = this.toolbarIconColor;
