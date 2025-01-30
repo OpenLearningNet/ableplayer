@@ -240,17 +240,7 @@ var Player = require("@vimeo/player");
 					thisObj.usingVimeoCaptions = false; 
 					deferred.resolve();
 				}
-
-				// setupPopups again with new captions array, replacing original
-				thisObj.setupPopups('captions');
-				deferred.resolve();
-			}
-			else {
-				thisObj.hasCaptions = false;
-				thisObj.usingVimeoCaptions = false;
-				deferred.resolve();
-			}
-		});
+			});
 
 		return promise;
 	};
