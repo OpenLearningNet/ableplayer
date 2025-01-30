@@ -10,21 +10,21 @@ var jQuery = require("jquery");
 			// If sign language is provided, it must be provided for all sources
 			this.signFile = this.$sources.first().attr('data-sign-src');
 			if (this.signFile) {
-  		  if (this.isIOS()) {
-    		  // IOS does not allow multiple videos to play simultaneously
-    		  // Therefore, sign language as rendered by Able Player unfortunately won't work
-          this.hasSignLanguage = false;
-          if (this.debug) {
-            console.log('Sign language has been disabled due to IOS restrictions');
-          }
-        }
-        else {
-  				if (this.debug) {
-	  				console.log('This video has an accompanying sign language video: ' + this.signFile);
-          }
-          this.hasSignLanguage = true;
-          this.injectSignPlayerCode();
-        }
+				if (this.isIOS()) {
+					// IOS does not allow multiple videos to play simultaneously
+					// Therefore, sign language as rendered by Able Player unfortunately won't work
+					this.hasSignLanguage = false;
+					if (this.debug) {
+						console.log('Sign language has been disabled due to IOS restrictions');
+					}
+				}
+				else {
+					if (this.debug) {
+						console.log('This video has an accompanying sign language video: ' + this.signFile);
+					}
+					this.hasSignLanguage = true;
+					this.injectSignPlayerCode();
+				}
 			}
 			else {
 				this.hasSignLanguage = false;
@@ -72,8 +72,8 @@ var jQuery = require("jquery");
 
 		this.$signWindow = $('<div>',{
 			'class' : 'able-sign-window',
-  		'role': 'dialog',
-      'aria-label': this.tt.sign
+			'role': 'dialog',
+			'aria-label': this.tt.sign
 		});
 		this.$signToolbar = $('<div>',{
 			'class': 'able-window-toolbar able-' + this.toolbarIconColor + '-controls'

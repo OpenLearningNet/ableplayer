@@ -74,11 +74,11 @@ exports.strings = {
 
 "preferences": "Voorkeuren",
 
-"enterFullScreen": "Ga naar volledig scherm",
+"enterFullscreen": "Ga naar volledig scherm",
 
-"exitFullScreen": "Verlaat volledig scherm",
+"exitFullscreen": "Verlaat volledig scherm",
 
-"fullScreen": "Volledig scherm",
+"fullscreen": "Volledig scherm",
 
 "speed": "Snelheid",
 
@@ -204,7 +204,25 @@ exports.strings = {
 
 "prefDescPause": "Pauzeer video automatisch als beschrijving aan wordt gezet",
 
-"prefVisibleDesc": "Als er een tekst-gebaseerde beschrijving is, maak deze dan zichtbaar",
+"prefDescVisible": "Als er een tekst-gebaseerde beschrijving is, maak deze dan zichtbaar",
+
+"prefDescVoice": "Voice",
+
+"prefDescRate": "Rate",
+
+"prefDescPitch": "Pitch",
+
+"prefDescPitch1": "Very low",
+
+"prefDescPitch2": "Low",
+
+"prefDescPitch3": "Default",
+
+"prefDescPitch4": "High",
+
+"prefDescPitch5": "Very high",
+
+"sampleDescriptionText": "Adjust settings to hear this sample text.",
 
 "prefHighlight": "Transcript highlighten terwijl media speelt",
 
