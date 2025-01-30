@@ -4,7 +4,7 @@ var jQuery = require("jquery");
 	var focusableElementsSelector = "a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
 
 	// Based on the incredible accessible modal dialog.
-	window.AccessibleDialog = function(modalDiv, $returnElement, dialogRole, title, $descDiv, closeButtonLabel, width, fullscreen, escapeHook) {
+	window.AccessibleDialog = function(modalDiv, $returnElement, dialogRole, isModal, title, $descDiv, closeButtonLabel, width, fullscreen, escapeHook) {
 
 		this.title = title;
 		this.closeButtonLabel = closeButtonLabel;
@@ -15,8 +15,7 @@ var jQuery = require("jquery");
 		var modal = modalDiv;
 		this.modal = modal;
 		modal.css({
-			'width': width || '50%',
-			'top': (fullscreen ? '0' : '5%')
+			'width': width || '50%'
 		});
 		modal.addClass('able-modal-dialog');
 
@@ -39,12 +38,10 @@ var jQuery = require("jquery");
 			titleH1.attr('id', 'modalTitle-' + this.baseId);
 			titleH1.css('text-align', 'center');
 			titleH1.text(title);
-
-			$descDiv.attr('id', 'modalDesc-' + this.baseId);
+			this.titleH1 = titleH1; 
 
 			modal.attr({
 				'aria-labelledby': 'modalTitle-' + this.baseId,
-				'aria-describedby': 'modalDesc-' + this.baseId
 			});
 			modal.prepend(titleH1);
 			modal.prepend(closeButton);
@@ -52,8 +49,11 @@ var jQuery = require("jquery");
 
 		modal.attr({
 			'aria-hidden': 'true',
-			'role': dialogRole
+			'role': dialogRole,
 		});
+		if (isModal) { 
+			modal.attr('aria-modal','true');
+		}
 
 		modal.keydown(function (e) {
 			// Escape
@@ -145,11 +145,11 @@ var jQuery = require("jquery");
 		this.focusedElementBeforeModal.focus();
 	};
 
-  AccessibleDialog.prototype.getInputs = function () {
+	AccessibleDialog.prototype.getInputs = function () {
 
-    // return an array of input elements within this dialog
-    if (this.modal) {
-		  var inputs = this.modal.find('input');
+		// return an array of input elements within this dialog
+		if (this.modal) {
+			var inputs = this.modal.find('input');
 			return inputs;
 		}
 		return false;

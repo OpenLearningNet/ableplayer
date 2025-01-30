@@ -4,7 +4,7 @@ var Cookies = require("js-cookie");
 (function ($) {
 	AblePlayer.prototype.seekTo = function (newTime) {
 
-    var thisObj = this;
+		var thisObj = this;
 
 		// define variables to be used for analytics
 		// e.g., to measure the extent to which users seek back and forward
@@ -13,6 +13,11 @@ var Cookies = require("js-cookie");
 
 		this.seeking = true;
 		this.liveUpdatePending = true;
+
+		if (this.speakingDescription) { 			
+			this.synth.cancel(); 
+		}
+
 		if (this.player === 'html5') {
 			var seekable;
 
@@ -23,7 +28,8 @@ var Cookies = require("js-cookie");
 				// ok to seek to startTime
 				// canplaythrough will be triggered when seeking is complete
 				// this.seeking will be set to false at that point
-				this.media.currentTime = this.startTime;
+				this.media.currentTime = this.startTime; 
+				this.seekStatus = 'complete'; 
 				if (this.hasSignLanguage && this.signVideo) {
 					// keep sign languge video in sync
 					this.signVideo.currentTime = this.startTime;
@@ -98,7 +104,6 @@ var Cookies = require("js-cookie");
 
 		// returns duration of the current media, expressed in seconds
 		// function is called by getMediaTimes, and return value is sanitized there
-
 		var deferred, promise, thisObj;
 
 		deferred = new $.Deferred();
@@ -123,11 +128,17 @@ var Cookies = require("js-cookie");
 		else {
 			var duration;
 			if (this.player === 'html5') {
-				duration = this.media.duration;
+				duration = this.media.duration;			
 			}
 			else if (this.player === 'youtube') {
-				if (this.youTubePlayer) {
-					duration = this.youTubePlayer.getDuration();
+				if (this.youTubePlayerReady) {
+					if (this.duration > 0) { 
+						// duration was already retrieved while checking for captions
+						duration = this.duration; 
+					}
+					else { 
+						duration = this.youTubePlayer.getDuration();
+					}
 				}
 				else { // the YouTube player hasn't initialized yet
 					duration = 0;
@@ -175,7 +186,7 @@ var Cookies = require("js-cookie");
 				elapsed = this.media.currentTime;
 			}
 			else if (this.player === 'youtube') {
-				if (this.youTubePlayer) {
+				if (this.youTubePlayerReady) {
 					elapsed = this.youTubePlayer.getCurrentTime();
 				}
 				else { // the YouTube player hasn't initialized yet
@@ -204,6 +215,7 @@ var Cookies = require("js-cookie");
 		// Commented out the following in 3.2.1 - not sure of its intended purpose
 		// It can be useful to know player state even when swapping src
 		// and the overhead is seemingly minimal
+		// TODO - Investigate this further. Delete if it's not needed
 		/*
 		if (this.swappingSrc) {
 			return;
@@ -219,7 +231,7 @@ var Cookies = require("js-cookie");
 				deferred.resolve('ended');
 			}
 			else if (this.media.paused) {
-  		  deferred.resolve('paused');
+				deferred.resolve('paused');
 			}
 			else if (this.media.readyState !== 4) {
 				deferred.resolve('buffering');
@@ -228,7 +240,7 @@ var Cookies = require("js-cookie");
 				deferred.resolve('playing');
 			}
 		}
-		else if (this.player === 'youtube' && this.youTubePlayer) {
+		else if (this.player === 'youtube' && this.youTubePlayerReady) {
 			var state = this.youTubePlayer.getPlayerState();
 			if (state === -1 || state === 5) {
 				deferred.resolve('stopped');
@@ -279,9 +291,15 @@ var Cookies = require("js-cookie");
 			}
 		}
 		else if (this.player === 'youtube') {
-			// Youtube supports varying playback rates per video.	 Only expose controls if more than one playback rate is available.
-			if (this.youTubePlayer.getAvailablePlaybackRates().length > 1) {
-				return true;
+			// Youtube supports varying playback rates per video.	 
+			// Only expose controls if more than one playback rate is available.
+			if (this.youTubePlayerReady) { 
+				if (this.youTubePlayer.getAvailablePlaybackRates().length > 1) {
+					return true;
+				}
+				else { 
+					return false;
+				}
 			}
 			else {
 				return false;
@@ -294,8 +312,14 @@ var Cookies = require("js-cookie");
 	};
 
 	AblePlayer.prototype.setPlaybackRate = function (rate) {
-
+		
 		rate = Math.max(0.5, rate);
+
+		if (this.hasClosedDesc && this.descMethod === 'text') { 
+			// keep speech rate in sync with playback rate even if descOn is false 
+			this.syncSpeechToPlaybackRate(rate); 
+		}
+
 		if (this.player === 'html5') {
 			this.media.playbackRate = rate;
 		}
@@ -310,7 +334,7 @@ var Cookies = require("js-cookie");
 		}
 		this.playbackRate = rate;
 		this.$speed.text(this.tt.speed + ': ' + rate.toFixed(2).toString() + 'x');
-	};
+	};	
 
 	AblePlayer.prototype.getPlaybackRate = function () {
 
@@ -318,7 +342,9 @@ var Cookies = require("js-cookie");
 			return this.media.playbackRate;
 		}
 		else if (this.player === 'youtube') {
-			return this.youTubePlayer.getPlaybackRate();
+			if (this.youTubePlayerReady) {
+				return this.youTubePlayer.getPlaybackRate();
+			}
 		}
 	};
 
@@ -379,6 +405,7 @@ var Cookies = require("js-cookie");
 			}
 		}
 		else if (this.player === 'youtube') {
+
 			this.youTubePlayer.playVideo();
 			if (typeof this.$posterImg !== 'undefined') {
 				this.$posterImg.hide();
@@ -436,7 +463,7 @@ var Cookies = require("js-cookie");
 			});
 		}
 		else if (direction == 'in') {
-			// restore vidcapContainer to its original height (needs work)
+			// restore captionsContainer to its original height (needs work)
 			// this.$mediaContainer.removeAttr('style');
 			// fade relatively quickly back to its original position with full opacity
 			// this.$playerDiv.removeClass('able-offscreen').fadeTo(100,1);
@@ -487,12 +514,12 @@ var Cookies = require("js-cookie");
 
 		thisObj = this;
 		if (this.swappingSrc) {
-  		if (this.playing) {
-  			// wait until new source has loaded before refreshing controls
-  			// can't wait if player is NOT playing because some critical events
-  			// won't fire until playback of new media starts
-        return;
-		  }
+			if (this.playing) {
+				// wait until new source has loaded before refreshing controls
+				// can't wait if player is NOT playing because some critical events
+				// won't fire until playback of new media starts
+				return;
+			}
 		}
 
 		if (context === 'timeline' || context === 'init') {
@@ -506,10 +533,10 @@ var Cookies = require("js-cookie");
 				this.chapterElapsed = this.getChapterElapsed();
 			}
 
-      if (this.useFixedSeekInterval === false && this.seekIntervalCalculated === false && this.duration > 0) {
-  		  // couldn't calculate seekInterval previously; try again.
-        this.setSeekInterval();
-		  }
+			if (this.useFixedSeekInterval === false && this.seekIntervalCalculated === false && this.duration > 0) {
+				// couldn't calculate seekInterval previously; try again.
+				this.setSeekInterval();
+			}
 
 			if (this.seekBar) {
 				if (this.useChapterTimes) {
@@ -577,34 +604,36 @@ var Cookies = require("js-cookie");
 			}
 
 			if (this.skin === 'legacy') {
-  			// Update seekbar width.
-        // To do this, we need to calculate the width of all buttons surrounding it.
-        if (this.seekBar) {
-				  widthUsed = 0;
-          leftControls = this.seekBar.wrapperDiv.parent().prev('div.able-left-controls');
-          rightControls = leftControls.next('div.able-right-controls');
-          leftControls.children().each(function () {
-					  if ($(this).attr('role')=='button') {
-						  widthUsed += $(this).outerWidth(true); // true = include margin
-					  }
-				  });
-          rightControls.children().each(function () {
-					  if ($(this).attr('role')=='button') {
-						  widthUsed += $(this).outerWidth(true);
-					  }
-				  });
-          if (this.fullscreen) {
-					  seekbarWidth = $(window).width() - widthUsed;
-				  }
-          else {
-					  seekbarWidth = this.$ableWrapper.width() - widthUsed;
-				  }
-          // Sometimes some minor fluctuations based on browser weirdness, so set a threshold.
-          if (Math.abs(seekbarWidth - this.seekBar.getWidth()) > 5) {
-					  this.seekBar.setWidth(seekbarWidth);
-				  }
-			  }
-      }
+				// Update seekbar width.
+				// To do this, we need to calculate the width of all buttons surrounding it.
+				if (this.seekBar) {
+					widthUsed = 0;
+					leftControls = this.seekBar.wrapperDiv.parent().prev('div.able-left-controls');
+					rightControls = leftControls.next('div.able-right-controls');
+					leftControls.children().each(function () {
+						if ($(this).attr('role')=='button') {
+							widthUsed += $(this).outerWidth(true); // true = include margin
+						}
+					});
+					rightControls.children().each(function () {
+						if ($(this).attr('role')=='button') {
+							widthUsed += $(this).outerWidth(true);
+						}
+					});
+					if (this.fullscreen) {
+						seekbarWidth = $(window).width() - widthUsed;
+					}
+					else {
+						// seekbar is wide enough to fill the remaining space
+						// include a 5px buffer to account for minor browser differences  
+						seekbarWidth = this.$ableWrapper.width() - widthUsed - 5;
+					}					
+					// Sometimes some minor fluctuations based on browser weirdness, so set a threshold.
+					if (Math.abs(seekbarWidth - this.seekBar.getWidth()) > 5) {
+						this.seekBar.setWidth(seekbarWidth);
+					}
+				}
+			}
 
 			// Update buffering progress.
 			// TODO: Currently only using the first HTML5 buffered interval,
@@ -622,16 +651,18 @@ var Cookies = require("js-cookie");
 					}
 					else {
 						if (this.seekBar) {
-              if (!isNaN(buffered)) {
-  							this.seekBar.setBuffered(buffered / duration);
-  						}
+							if (!isNaN(buffered)) {
+								this.seekBar.setBuffered(buffered / duration);
+							}
 						}
 					}
 				}
 			}
 			else if (this.player === 'youtube') {
 				if (this.seekBar) {
-					this.seekBar.setBuffered(this.youTubePlayer.getVideoLoadedFraction());
+					if (this.youTubePlayerReady) {
+						this.seekBar.setBuffered(this.youTubePlayer.getVideoLoadedFraction());
+					}
 				}
 			}
 			else if (this.player === 'vimeo') {
@@ -664,6 +695,7 @@ var Cookies = require("js-cookie");
 				// Otherwise, it is just always "Captions"
 				if (!this.captionsOn) {
 					this.$ccButton.addClass('buttonOff');
+					this.$ccButton.attr('aria-pressed', 'false')
 					if (captionsCount === 1) {
 						this.$ccButton.attr('aria-label',this.tt.showCaptions);
 						this.$ccButton.find('span.able-clipped').text(this.tt.showCaptions);
@@ -671,6 +703,7 @@ var Cookies = require("js-cookie");
 				}
 				else {
 					this.$ccButton.removeClass('buttonOff');
+					this.$ccButton.attr('aria-pressed', 'true')
 					if (captionsCount === 1) {
 						this.$ccButton.attr('aria-label',this.tt.hideCaptions);
 						this.$ccButton.find('span.able-clipped').text(this.tt.hideCaptions);
@@ -689,33 +722,34 @@ var Cookies = require("js-cookie");
 		}
 
 		if (context === 'fullscreen' || context == 'init'){
-
 			if (this.$fullscreenButton) {
 				if (!this.fullscreen) {
-					this.$fullscreenButton.attr('aria-label', this.tt.enterFullScreen);
+					this.$fullscreenButton.attr('aria-label', this.tt.enterFullscreen);
 					if (this.iconType === 'font') {
 						this.$fullscreenButton.find('span').first().removeClass('icon-fullscreen-collapse').addClass('icon-fullscreen-expand');
-						this.$fullscreenButton.find('span.able-clipped').text(this.tt.enterFullScreen);
+						this.$fullscreenButton.find('span.able-clipped').text(this.tt.enterFullscreen);
 					}
 					else if (this.iconType === 'svg') {
 						newSvgData = this.getSvgData('fullscreen-expand');
 						this.$fullscreenButton.find('svg').attr('viewBox',newSvgData[0]);
 						this.$fullscreenButton.find('path').attr('d',newSvgData[1]);
+						this.$fullscreenButton.find('span.able-clipped').text(this.tt.enterFullscreen);
 					}
 					else {
 						this.$fullscreenButton.find('img').attr('src',this.fullscreenExpandButtonImg);
 					}
 				}
 				else {
-					this.$fullscreenButton.attr('aria-label',this.tt.exitFullScreen);
+					this.$fullscreenButton.attr('aria-label',this.tt.exitFullscreen);
 					if (this.iconType === 'font') {
 						this.$fullscreenButton.find('span').first().removeClass('icon-fullscreen-expand').addClass('icon-fullscreen-collapse');
-						this.$fullscreenButton.find('span.able-clipped').text(this.tt.exitFullScreen);
+						this.$fullscreenButton.find('span.able-clipped').text(this.tt.exitFullscreen);
 					}
 					else if (this.iconType === 'svg') {
 						newSvgData = this.getSvgData('fullscreen-collapse');
 						this.$fullscreenButton.find('svg').attr('viewBox',newSvgData[0]);
 						this.$fullscreenButton.find('path').attr('d',newSvgData[1]);
+						this.$fullscreenButton.find('span.able-clipped').text(this.tt.exitFullscreen);
 					}
 					else {
 						this.$fullscreenButton.find('img').attr('src',this.fullscreenCollapseButtonImg);
@@ -729,6 +763,8 @@ var Cookies = require("js-cookie");
 				if (this.paused && !this.seekBar.tracking) {
 					if (!this.hideBigPlayButton) {
 						this.$bigPlayButton.show();
+						this.$bigPlayButton.attr('aria-hidden', 'false');
+
 					}
 					if (this.fullscreen) {
 						this.$bigPlayButton.width($(window).width());
@@ -741,6 +777,7 @@ var Cookies = require("js-cookie");
 				}
 				else {
 					this.$bigPlayButton.hide();
+					this.$bigPlayButton.attr('aria-hidden', 'true');
 				}
 			}
 		}
@@ -771,8 +808,8 @@ var Cookies = require("js-cookie");
 						// only scroll once after moving a highlight
 						if (this.movingHighlight) {
 							this.$transcriptDiv.scrollTop(newTop);
-			                this.movingHighlight = false;
-			            }
+											this.movingHighlight = false;
+									}
 					}
 				}
 			}
@@ -816,6 +853,7 @@ var Cookies = require("js-cookie");
 						newSvgData = this.getSvgData('play');
 						this.$playpauseButton.find('svg').attr('viewBox',newSvgData[0]);
 						this.$playpauseButton.find('path').attr('d',newSvgData[1]);
+						this.$playpauseButton.find('span.able-clipped').text(this.tt.play);
 					}
 					else {
 						this.$playpauseButton.find('img').attr('src',this.playButtonImg);
@@ -831,35 +869,35 @@ var Cookies = require("js-cookie");
 							// Debounce updates; only update after status has stayed steadily different for a while
 							// "A while" is defined differently depending on context
 							if (thisObj.swappingSrc) {
-                // this is where most of the chatter occurs (e.g., playing, paused, buffering, playing),
-                // so set a longer wait time before writing a status message
-                if (!thisObj.debouncingStatus) {
-                  thisObj.statusMessageThreshold = 2000; // in ms (2 seconds)
-                }
-              }
-              else {
-                // for all other contexts (e.g., users clicks Play/Pause)
-                // user should receive more rapid feedback
-                if (!thisObj.debouncingStatus) {
-                  thisObj.statusMessageThreshold = 250; // in ms
-                }
-              }
-  						timestamp = (new Date()).getTime();
+								// this is where most of the chatter occurs (e.g., playing, paused, buffering, playing),
+								// so set a longer wait time before writing a status message
+								if (!thisObj.debouncingStatus) {
+									thisObj.statusMessageThreshold = 2000; // in ms (2 seconds)
+								}
+							}
+							else {
+								// for all other contexts (e.g., users clicks Play/Pause)
+								// user should receive more rapid feedback
+								if (!thisObj.debouncingStatus) {
+									thisObj.statusMessageThreshold = 250; // in ms
+								}
+							}
+							timestamp = (new Date()).getTime();
 							if (!thisObj.statusDebounceStart) {
 								thisObj.statusDebounceStart = timestamp;
 								// Call refreshControls() again after allotted time has passed
 								thisObj.debouncingStatus = true;
 								thisObj.statusTimeout = setTimeout(function () {
-                  thisObj.debouncingStatus = false;
+									thisObj.debouncingStatus = false;
 									thisObj.refreshControls(context);
 								}, thisObj.statusMessageThreshold);
 							}
 							else if ((timestamp - thisObj.statusDebounceStart) > thisObj.statusMessageThreshold) {
-    						thisObj.$status.text(textByState[currentState]);
-                thisObj.statusDebounceStart = null;
-                clearTimeout(thisObj.statusTimeout);
-                thisObj.statusTimeout = null;
-						  }
+								thisObj.$status.text(textByState[currentState]);
+								thisObj.statusDebounceStart = null;
+								clearTimeout(thisObj.statusTimeout);
+								thisObj.statusTimeout = null;
+							}
 						}
 						else {
 							thisObj.statusDebounceStart = null;
@@ -880,6 +918,7 @@ var Cookies = require("js-cookie");
 									newSvgData = thisObj.getSvgData('play');
 									thisObj.$playpauseButton.find('svg').attr('viewBox',newSvgData[0]);
 									thisObj.$playpauseButton.find('path').attr('d',newSvgData[1]);
+									thisObj.$playpauseButton.find('span.able-clipped').text(thisObj.tt.play);
 								}
 								else {
 									thisObj.$playpauseButton.find('img').attr('src',thisObj.playButtonImg);
@@ -896,6 +935,7 @@ var Cookies = require("js-cookie");
 									newSvgData = thisObj.getSvgData('pause');
 									thisObj.$playpauseButton.find('svg').attr('viewBox',newSvgData[0]);
 									thisObj.$playpauseButton.find('path').attr('d',newSvgData[1]);
+									thisObj.$playpauseButton.find('span.able-clipped').text(thisObj.tt.pause);
 								}
 								else {
 									thisObj.$playpauseButton.find('img').attr('src',thisObj.pauseButtonImg);
@@ -958,44 +998,65 @@ var Cookies = require("js-cookie");
 	AblePlayer.prototype.handlePlay = function(e) {
 
 		if (this.paused) {
+			// user clicked play 
+			this.okToPlay = true; 
 			this.playMedia();
+			if (this.synth.paused) { 
+				// media was paused while description was speaking 
+				// resume utterance 
+				this.synth.resume(); 
+			}
 		}
 		else {
+			// user clicked pause
+			this.okToPlay = false; 
 			this.pauseMedia();
+			if (this.speakingDescription) { 
+				// pause the current utterance 
+				// it will resume when the user presses play 
+				this.synth.pause();				
+			}
+		}
+		if (this.speechEnabled === null) { 			
+			this.initSpeech('play'); 
 		}
 	};
 
 	AblePlayer.prototype.handleRestart = function() {
 
+		if (this.speakingDescription) { 
+			// cancel audio description 
+			this.synth.cancel();				
+		}			
 		this.seekTo(0);
 	};
 
 	AblePlayer.prototype.handlePrevTrack = function() {
 
-    if (this.playlistIndex === 0) {
-      // currently on the first track
-      // wrap to bottom and play the last track
-      this.playlistIndex = this.$playlist.length - 1;
-    }
-    else {
-		  this.playlistIndex--;
-    }
+		if (this.playlistIndex === 0) {
+			// currently on the first track
+			// wrap to bottom and play the last track
+			this.playlistIndex = this.$playlist.length - 1;
+		}
+		else {
+			this.playlistIndex--;
+		}
 		this.cueingPlaylistItem = true; // stopgap to prevent multiple firings
-    this.cuePlaylistItem(this.playlistIndex);
+		this.cuePlaylistItem(this.playlistIndex);
 	};
 
 	AblePlayer.prototype.handleNextTrack = function() {
 
-    if (this.playlistIndex === this.$playlist.length - 1) {
-      // currently on the last track
-      // wrap to top and play the forst track
-      this.playlistIndex = 0;
-    }
-    else {
-		  this.playlistIndex++;
-    }
+		if (this.playlistIndex === this.$playlist.length - 1) {
+			// currently on the last track
+			// wrap to top and play the forst track
+			this.playlistIndex = 0;
+		}
+		else {
+			this.playlistIndex++;
+		}
 		this.cueingPlaylistItem = true; // stopgap to prevent multiple firings
-    this.cuePlaylistItem(this.playlistIndex);
+		this.cuePlaylistItem(this.playlistIndex);
 	};
 
 	AblePlayer.prototype.handleRewind = function() {
@@ -1071,17 +1132,19 @@ var Cookies = require("js-cookie");
 			this.setPlaybackRate(this.getPlaybackRate() + (0.25 * dir));
 		}
 		else if (this.player === 'youtube') {
-			rates = this.youTubePlayer.getAvailablePlaybackRates();
-			currentRate = this.getPlaybackRate();
-			index = rates.indexOf(currentRate);
-			if (index === -1) {
-				console.log('ERROR: Youtube returning unknown playback rate ' + currentRate.toString());
-			}
-			else {
-				index += dir;
-				// Can only increase or decrease rate if there's another rate available.
-				if (index < rates.length && index >= 0) {
-					this.setPlaybackRate(rates[index]);
+			if (this.youTubePlayerReady) {
+				rates = this.youTubePlayer.getAvailablePlaybackRates();
+				currentRate = this.getPlaybackRate();
+				index = rates.indexOf(currentRate);
+				if (index === -1) {
+					console.log('ERROR: Youtube returning unknown playback rate ' + currentRate.toString());
+				}
+				else {
+					index += dir;
+					// Can only increase or decrease rate if there's another rate available.
+					if (index < rates.length && index >= 0) {
+						this.setPlaybackRate(rates[index]);
+					}
 				}
 			}
 		}
@@ -1112,6 +1175,7 @@ var Cookies = require("js-cookie");
 
 	AblePlayer.prototype.handleCaptionToggle = function() {
 
+		var thisObj = this;
 		var captions;
 		if (this.hidingPopup) {
 			// stopgap to prevent spacebar in Firefox from reopening popup
@@ -1131,9 +1195,13 @@ var Cookies = require("js-cookie");
 				// turn them off
 				this.captionsOn = false;
 				this.prefCaptions = 0;
+				this.$ccButton.attr('aria-pressed', 'false');
 				this.updateCookie('prefCaptions');
 				if (this.usingYouTubeCaptions) {
-					this.youTubePlayer.unloadModule(this.ytCaptionModule);
+					this.youTubePlayer.unloadModule('captions');
+				}
+				else if (this.usingVimeoCaptions) { 
+					this.vimeoPlayer.disableTextTrack(); 
 				}
 				else {
 					this.$captionsWrapper.hide();
@@ -1143,11 +1211,32 @@ var Cookies = require("js-cookie");
 				// captions are off. Turn them on.
 				this.captionsOn = true;
 				this.prefCaptions = 1;
+				this.$ccButton.attr('aria-pressed', 'true');
 				this.updateCookie('prefCaptions');
 				if (this.usingYouTubeCaptions) {
-					if (typeof this.ytCaptionModule !== 'undefined') {
-						this.youTubePlayer.loadModule(this.ytCaptionModule);
-					}
+					this.youTubePlayer.loadModule('captions');
+				}
+				else if (this.usingVimeoCaptions) { 
+					this.vimeoPlayer.enableTextTrack(this.captionLang).then(function(track) {
+						// track.language = the iso code for the language
+						// track.kind = 'captions' or 'subtitles'
+						// track.label = the human-readable label
+					}).catch(function(error) {
+						switch (error.name) {
+							case 'InvalidTrackLanguageError':
+								// no track was available with the specified language
+								console.log('No ' + track.kind + ' track is available in the specified language (' + track.label + ')');
+								break;
+							case 'InvalidTrackError':
+								// no track was available with the specified language and kind
+								console.log('No ' + track.kind + ' track is available in the specified language (' + track.label + ')');
+								break;
+							default:
+								// some other error occurred
+								console.log('Error loading ' + track.label + ' ' + track.kind + ' track');
+								break;
+							}
+					});	
 				}
 				else {
 					this.$captionsWrapper.show();
@@ -1170,22 +1259,44 @@ var Cookies = require("js-cookie");
 			if (this.captionsPopup && this.captionsPopup.is(':visible')) {
 				this.captionsPopup.hide();
 				this.hidingPopup = false;
-				this.$ccButton.removeAttr('aria-expanded').focus();
+				this.$ccButton.attr('aria-expanded', 'false')
+				this.waitThenFocus(this.$ccButton);
 			}
 			else {
 				this.closePopups();
 				if (this.captionsPopup) {
 					this.captionsPopup.show();
 					this.$ccButton.attr('aria-expanded','true');
-					this.captionsPopup.css('top', this.$ccButton.position().top - this.captionsPopup.outerHeight());
-					this.captionsPopup.css('left', this.$ccButton.position().left)
-					// Place focus on the first button (even if another button is checked)
-					this.captionsPopup.find('li').removeClass('able-focus');
-					this.captionsPopup.find('li').first().focus().addClass('able-focus');
+
+					// Gives time to "register" expanded ccButton
+					setTimeout(function() {
+						thisObj.captionsPopup.css('top', thisObj.$ccButton.position().top - thisObj.captionsPopup.outerHeight());
+						thisObj.captionsPopup.css('left', thisObj.$ccButton.position().left)
+						// Place focus on the first button (even if another button is checked)
+						thisObj.captionsPopup.find('li').removeClass('able-focus');
+						thisObj.captionsPopup.find('li').first().focus().addClass('able-focus');
+					}, 50);
 				}
 			}
 		}
 	};
+
+	/**
+	 * Gives enough time for DOM changes to take effect before adjusting focus.
+	 * Helpful for allowing screen reading of elements whose state is intermittently changed.
+	 * 
+	 * @param {*} $el element to focus on
+	 * @param {*} timeout optional wait time in milliseconds before focus
+	 */
+	AblePlayer.prototype.waitThenFocus = function($el, timeout) {
+
+		// Default wait time of 50 ms
+		var _timeout = (timeout === undefined || timeout === null) ? 50 : timeout;
+		
+		setTimeout(function() {
+			$el.focus();
+		}, _timeout);
+	}
 
 	AblePlayer.prototype.handleChapters = function () {
 		if (this.hidingPopup) {
@@ -1197,7 +1308,7 @@ var Cookies = require("js-cookie");
 		if (this.chaptersPopup.is(':visible')) {
 			this.chaptersPopup.hide();
 			this.hidingPopup = false;
-			this.$chaptersButton.removeAttr('aria-expanded').focus();
+			this.$chaptersButton.attr('aria-expanded','false').focus();
 		}
 		else {
 			this.closePopups();
@@ -1223,10 +1334,13 @@ var Cookies = require("js-cookie");
 		this.descOn = !this.descOn;
 		this.prefDesc = + this.descOn; // convert boolean to integer
 		this.updateCookie('prefDesc');
-		if (!this.$descDiv.is(':hidden')) {
-			this.$descDiv.hide();
+		if (typeof this.$descDiv !== 'undefined') {
+			if (!this.$descDiv.is(':hidden')) {
+				this.$descDiv.hide();
+			}
+			// NOTE: now showing $descDiv here if previously hidden 
+			// that's handled elsewhere, dependent on whether there's text to show
 		}
-		this.refreshingDesc = true;
 		this.initDescription();
 		this.refreshControls('descriptions');
 	};
@@ -1236,10 +1350,19 @@ var Cookies = require("js-cookie");
 		// NOTE: the prefs menu is positioned near the right edge of the player
 		// This assumes the Prefs button is also positioned in that vicinity
 		// (last or second-last button the right)
+
+		// NOTE: If previously unable to fully populate the Description dialog
+		// because the Web Speech API failed to getVoices()
+		// now is a good time to try again
+		// so the Description dialog can be rebuilt before the user requests it
+
 		var thisObj, prefsButtonPosition, prefsMenuRight, prefsMenuLeft;
 
 		thisObj = this;
 
+		if (this.speechEnabled === null) { 			
+			this.initSpeech('prefs'); 
+		}
 		if (this.hidingPopup) {
 			// stopgap to prevent spacebar in Firefox from reopening popup
 			// immediately after closing it
@@ -1248,30 +1371,33 @@ var Cookies = require("js-cookie");
 		}
 		if (this.prefsPopup.is(':visible')) {
 			this.prefsPopup.hide();
-			this.$prefsButton.removeAttr('aria-expanded');
+			this.$prefsButton.attr('aria-expanded','false');
 			// restore each menu item to original hidden state
 			this.prefsPopup.find('li').removeClass('able-focus').attr('tabindex','-1');
 			if (!this.showingPrefsDialog) {
-  			this.$prefsButton.focus();
+				this.$prefsButton.focus();
 			}
 			// wait briefly, then reset hidingPopup
 			setTimeout(function() {
-  			thisObj.hidingPopup = false;
-  		},100);
+				thisObj.hidingPopup = false;
+			},100);
 		}
 		else {
 			this.closePopups();
 			this.prefsPopup.show();
 			this.$prefsButton.attr('aria-expanded','true');
-			prefsButtonPosition = this.$prefsButton.position();
-			prefsMenuRight = this.$ableDiv.width() - 5;
-			prefsMenuLeft = prefsMenuRight - this.prefsPopup.width();
-			this.prefsPopup.css('top', prefsButtonPosition.top - this.prefsPopup.outerHeight());
-			this.prefsPopup.css('left', prefsMenuLeft);
-			// remove prior focus and set focus on first item; also change tabindex from -1 to 0
-			this.prefsPopup.find('li').removeClass('able-focus').attr('tabindex','0');
-			this.prefsPopup.find('li').first().focus().addClass('able-focus');
-
+			this.$prefsButton.focus(); // focus first on prefs button to announce expanded state
+			// give time for focus on button then adjust popup settings and focus
+			setTimeout(function() {
+				prefsButtonPosition = thisObj.$prefsButton.position();
+				prefsMenuRight = thisObj.$ableDiv.width() - 5;
+				prefsMenuLeft = prefsMenuRight - thisObj.prefsPopup.width();
+				thisObj.prefsPopup.css('top', prefsButtonPosition.top - thisObj.prefsPopup.outerHeight());
+				thisObj.prefsPopup.css('left', prefsMenuLeft);
+				// remove prior focus and set focus on first item; also change tabindex from -1 to 0
+				thisObj.prefsPopup.find('li').removeClass('able-focus').attr('tabindex','0');
+				thisObj.prefsPopup.find('li').first().focus().addClass('able-focus');
+			}, 50);
 		}
 	};
 
@@ -1282,7 +1408,7 @@ var Cookies = require("js-cookie");
 
 	AblePlayer.prototype.handleTranscriptToggle = function () {
 
-  	var thisObj = this;
+		var thisObj = this;
 
 		if (this.$transcriptDiv.is(':visible')) {
 			this.$transcriptArea.hide();
@@ -1290,13 +1416,13 @@ var Cookies = require("js-cookie");
 			this.$transcriptButton.find('span.able-clipped').text(this.tt.showTranscript);
 			this.prefTranscript = 0;
 			this.$transcriptButton.focus().addClass('able-focus');
-      // wait briefly before resetting stopgap var
-      // otherwise the keypress used to select 'Close' will trigger the transcript button
-      // Benchmark tests: If this is gonna happen, it typically happens in around 3ms; max 12ms
-      // Setting timeout to 100ms is a virtual guarantee of proper functionality
-      setTimeout(function() {
-        thisObj.closingTranscript = false;
-      }, 100);
+			// wait briefly before resetting stopgap var
+			// otherwise the keypress used to select 'Close' will trigger the transcript button
+			// Benchmark tests: If this is gonna happen, it typically happens in around 3ms; max 12ms
+			// Setting timeout to 100ms is a virtual guarantee of proper functionality
+			setTimeout(function() {
+				thisObj.closingTranscript = false;
+			}, 100);
 		}
 		else {
 			this.positionDraggableWindow('transcript');
@@ -1308,19 +1434,19 @@ var Cookies = require("js-cookie");
 			this.$transcriptButton.find('span.able-clipped').text(this.tt.hideTranscript);
 			this.prefTranscript = 1;
 			// move focus to first focusable element (window options button)
-      this.focusNotClick = true;
+			this.focusNotClick = true;
 			this.$transcriptArea.find('button').first().focus();
-      // wait briefly before resetting stopgap var
-      setTimeout(function() {
-        thisObj.focusNotClick = false;
-      }, 100);
+			// wait briefly before resetting stopgap var
+			setTimeout(function() {
+				thisObj.focusNotClick = false;
+			}, 100);
 		}
 		this.updateCookie('prefTranscript');
 	};
 
 	AblePlayer.prototype.handleSignToggle = function () {
 
-  	var thisObj = this;
+		var thisObj = this;
 
 		if (this.$signWindow.is(':visible')) {
 			this.$signWindow.hide();
@@ -1328,11 +1454,11 @@ var Cookies = require("js-cookie");
 			this.$signButton.find('span.able-clipped').text(this.tt.showSign);
 			this.prefSign = 0;
 			this.$signButton.focus().addClass('able-focus');
-      // wait briefly before resetting stopgap var
-      // otherwise the keypress used to select 'Close' will trigger the transcript button
-      setTimeout(function() {
-        thisObj.closingSign = false;
-      }, 100);
+			// wait briefly before resetting stopgap var
+			// otherwise the keypress used to select 'Close' will trigger the transcript button
+			setTimeout(function() {
+				thisObj.closingSign = false;
+			}, 100);
 		}
 		else {
 			this.positionDraggableWindow('sign');
@@ -1343,13 +1469,13 @@ var Cookies = require("js-cookie");
 			this.$signButton.removeClass('buttonOff').attr('aria-label',this.tt.hideSign);
 			this.$signButton.find('span.able-clipped').text(this.tt.hideSign);
 			this.prefSign = 1;
-      this.focusNotClick = true;
+			this.focusNotClick = true;
 			this.$signWindow.find('button').first().focus();
-      // wait briefly before resetting stopgap var
-      // otherwise the keypress used to select 'Close' will trigger the transcript button
-      setTimeout(function() {
-        thisObj.focusNotClick = false;
-      }, 100);
+			// wait briefly before resetting stopgap var
+			// otherwise the keypress used to select 'Close' will trigger the transcript button
+			setTimeout(function() {
+				thisObj.focusNotClick = false;
+			}, 100);
 		}
 		this.updateCookie('prefSign');
 	};
@@ -1366,8 +1492,8 @@ var Cookies = require("js-cookie");
 		if (this.nativeFullscreenSupported()) {
 			return (document.fullscreenElement ||
 							document.webkitFullscreenElement ||
-							document.webkitCurrentFullScreenElement ||
-							document.mozFullScreenElement ||
+							document.webkitCurrentFullscreenElement ||
+							document.mozFullscreenElement ||
 							document.msFullscreenElement) ? true : false;
 		}
 		else {
@@ -1390,17 +1516,14 @@ var Cookies = require("js-cookie");
 			if (fullscreen) {
 				// Initialize fullscreen
 
-				// But first, capture current settings so they can be restored later
-				this.preFullScreenWidth = this.$ableWrapper.width();
-				this.preFullScreenHeight = this.$ableWrapper.height();
 				if (el.requestFullscreen) {
 					el.requestFullscreen();
 				}
 				else if (el.webkitRequestFullscreen) {
 					el.webkitRequestFullscreen();
 				}
-				else if (el.mozRequestFullScreen) {
-					el.mozRequestFullScreen();
+				else if (el.mozRequestFullscreen) {
+					el.mozRequestFullscreen();
 				}
 				else if (el.msRequestFullscreen) {
 					el.msRequestFullscreen();
@@ -1409,55 +1532,24 @@ var Cookies = require("js-cookie");
 			}
 			else {
 				// Exit fullscreen
+				this.restoringAfterFullscreen = true; 
 				if (document.exitFullscreen) {
 					document.exitFullscreen();
 				}
 				else if (document.webkitExitFullscreen) {
 					document.webkitExitFullscreen();
 				}
-				else if (document.webkitCancelFullScreen) {
-					document.webkitCancelFullScreen();
+				else if (document.webkitCancelFullscreen) {
+					document.webkitCancelFullscreen();
 				}
-				else if (document.mozCancelFullScreen) {
-					document.mozCancelFullScreen();
+				else if (document.mozCancelFullscreen) {
+					document.mozCancelFullscreen();
 				}
 				else if (document.msExitFullscreen) {
 					document.msExitFullscreen();
 				}
 				this.fullscreen = false;
 			}
-			// add event handlers for changes in full screen mode
-			// currently most changes are made in response to windowResize event
-			// However, that alone is not resulting in a properly restored player size in Opera Mac
-			// More on the Opera Mac bug: https://github.com/ableplayer/ableplayer/issues/162
-			// this fullscreen event handler added specifically for Opera Mac,
-			// but includes event listeners for all browsers in case its functionality could be expanded
-			// Added functionality in 2.3.45 for handling YouTube return from fullscreen as well
-			$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange', function(e) {
-				// NOTE: e.type = the specific event that fired (in case needing to control for browser-specific idiosyncrasies)
-				if (!thisObj.fullscreen) {
-					// user has just exited full screen
-					thisObj.restoringAfterFullScreen = true;
-					thisObj.resizePlayer(thisObj.preFullScreenWidth,thisObj.preFullScreenHeight);
-				}
-				else if (!thisObj.clickedFullscreenButton) {
-					// user triggered fullscreenchange without clicking (or pressing) fullscreen button
-					// this is only possible if they pressed Escape to exit fullscreen mode
-					thisObj.fullscreen = false;
-					thisObj.restoringAfterFullScreen = true;
-					thisObj.resizePlayer(thisObj.preFullScreenWidth,thisObj.preFullScreenHeight);
-				}
-				// NOTE: The fullscreenchange (or browser-equivalent) event is triggered twice
-				// when exiting fullscreen via the "Exit fullscreen" button (only once if using Escape)
-				// Not sure why, but consequently we need to be sure thisObj.clickedFullScreenButton
-				// continues to be true through both events
-				// Could use a counter variable to control that (reset to false after the 2nd trigger)
-				// However, since I don't know why it's happening, and whether it's 100% reliable
-				// resetting clickedFullScreenButton after a timeout seems to be better approach
-				setTimeout(function() {
-					thisObj.clickedFullscreenButton = false;
-				},1000);
-			});
 		}
 		else {
 			// Non-native fullscreen support through modal dialog.
@@ -1470,7 +1562,7 @@ var Cookies = require("js-cookie");
 				}).text(this.tt.fullscreen); // In English: "Full screen"; TODO: Add alert text that is more descriptive
 				$dialogDiv.append($fsDialogAlert);
 				// now render this as a dialog
-				this.fullscreenDialog = new AccessibleDialog($dialogDiv, this.$fullscreenButton, 'dialog', 'Fullscreen video player', $fsDialogAlert, this.tt.exitFullScreen, '100%', true, function () { thisObj.handleFullscreenToggle() });
+				this.fullscreenDialog = new AccessibleDialog($dialogDiv, this.$fullscreenButton, 'dialog', true, 'Fullscreen video player', $fsDialogAlert, this.tt.exitFullscreen, '100%', true, function () { thisObj.handleFullscreenToggle() });
 				$('body').append($dialogDiv);
 			}
 
@@ -1492,10 +1584,11 @@ var Cookies = require("js-cookie");
 					$el.width('100%');
 				}
 				var newHeight = $(window).height() - this.$playerDiv.height();
-				if (!this.$descDiv.is(':hidden')) {
-					newHeight -= this.$descDiv.height();
+				if (typeof this.$descDiv !== 'undefined') {				
+					if (!this.$descDiv.is(':hidden')) {
+						newHeight -= this.$descDiv.height();
+					}
 				}
-				this.resizePlayer($(window).width(), newHeight);
 			}
 			else {
 				this.modalFullscreenActive = false;
@@ -1505,7 +1598,6 @@ var Cookies = require("js-cookie");
 				$el.insertAfter(this.$modalFullscreenPlaceholder);
 				this.$modalFullscreenPlaceholder.remove();
 				this.fullscreenDialog.hide();
-				this.resizePlayer(this.$ableWrapper.width(), this.$ableWrapper.height());
 			}
 
 			// Resume playback if moving stopped it.
@@ -1513,7 +1605,35 @@ var Cookies = require("js-cookie");
 				this.playMedia();
 			}
 		}
-		this.refreshControls('fullscreen');
+		// add event handlers for changes in fullscreen mode. 
+		// Browsers natively trigger this event with the Escape key,  
+		// in addition to clicking the exit fullscreen button 
+		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange', function(e) {
+			// NOTE: e.type = the specific event that fired (in case needing to control for browser-specific idiosyncrasies)
+			if (!thisObj.fullscreen) {
+				// user has just exited full screen
+				thisObj.restoringAfterFullscreen = true;
+			}
+			else if (!thisObj.clickedFullscreenButton) {
+				// user triggered fullscreenchange without clicking fullscreen button
+				thisObj.fullscreen = false;
+				thisObj.restoringAfterFullscreen = true;
+			}
+			thisObj.resizePlayer();
+			thisObj.refreshControls('fullscreen');
+
+			// NOTE: The fullscreenchange (or browser-equivalent) event is triggered twice
+			// when exiting fullscreen via the "Exit fullscreen" button (only once if using Escape)
+			// Not sure why, but consequently we need to be sure thisObj.clickedFullscreenButton
+			// continues to be true through both events
+			// Could use a counter variable to control that (reset to false after the 2nd trigger)
+			// However, since I don't know why it's happening, and whether it's 100% reliable
+			// resetting clickedFullscreenButton after a timeout seems to be better approach
+			setTimeout(function() {
+				thisObj.clickedFullscreenButton = false;
+				thisObj.restoringAfterFullscreen = false; 
+			},1000);
+		});		
 	};
 
 	AblePlayer.prototype.handleFullscreenToggle = function () {
@@ -1551,6 +1671,8 @@ var Cookies = require("js-cookie");
 				}
 			}
 		}
+		// don't resizePlayer yet; that will be called in response to the window resize event 
+		// this.resizePlayer();
 	};
 
 	AblePlayer.prototype.handleTranscriptLockToggle = function (val) {
@@ -1565,10 +1687,10 @@ var Cookies = require("js-cookie");
 	AblePlayer.prototype.showTooltip = function($tooltip) {
 
 		if (($tooltip).is(':animated')) {
-			$tooltip.stop(true,true).show().delay(4000).fadeOut(1000);
+			$tooltip.stop(true,true).show();
 		}
 		else {
-			$tooltip.stop().show().delay(4000).fadeOut(1000);
+			$tooltip.stop().show();
 		}
 	};
 
@@ -1665,82 +1787,152 @@ var Cookies = require("js-cookie");
 
 		var captionSizeOkMin, captionSizeOkMax, captionSize, newCaptionSize, newLineHeight;
 
-		if (this.fullscreen) { // replace isFullscreen() with a Boolean. see function for explanation
-			if (typeof this.$vidcapContainer !== 'undefined') {
-				this.$ableWrapper.css({
-					'width': width + 'px',
-					'max-width': ''
-				})
-				this.$vidcapContainer.css({
-					'height': height + 'px',
-					'width': width
-				});
-				this.$media.css({
-					'height': height + 'px',
-					'width': width
-				})
-			}
-			if (typeof this.$transcriptArea !== 'undefined') {
-				this.retrieveOffscreenWindow('transcript',width,height);
-			}
-			if (typeof this.$signWindow !== 'undefined') {
-				this.retrieveOffscreenWindow('sign',width,height);
-			}
+		var newWidth, newHeight, $iframe, alertTop; 
+
+		if (this.mediaType === 'audio') { 
+			return; 
 		}
-		else {
-			// player resized
-			if (this.restoringAfterFullScreen) {
-				// User has just exited fullscreen mode. Restore to previous settings
-				width = this.preFullScreenWidth;
-				height = this.preFullScreenHeight;
-				this.restoringAfterFullScreen = false;
-				this.$ableWrapper.css({
-					'max-width': width + 'px',
-					'width': ''
-				});
-				if (typeof this.$vidcapContainer !== 'undefined') {
-					this.$vidcapContainer.css({
-						'height': '',
-						'width': ''
+
+		if (typeof width !== 'undefined' && typeof height !== 'undefined') { 
+			// this is being called the first time a player is initialized 
+			// width and height were collected from the HTML, YouTube, or Vimeo media API
+			// so are reflective of the actual size of the media 
+			// use these values to calculate aspectRatio 
+			this.aspectRatio = height / width;  
+			if (this.playerWidth) { 
+				// default width is already defined via a width or data-width attribute. Use that. 				
+				newWidth = this.playerWidth; 
+				if (this.playerHeight) { 
+					newHeight = this.playerHeight; 
+				}
+				else { 
+					newHeight = Math.round(newWidth * this.aspectRatio); 
+					this.playerHeight = newHeight; 
+				}
+			}
+			else { 
+				// playerWidth was not defined via HTML attributes 
+				if (this.player === 'html5') { 
+					newWidth = $(window).width();
+				}
+				else { 
+					newWidth = this.$ableWrapper.width(); 
+				}
+				newHeight = Math.round(newWidth * this.aspectRatio); 
+			}				
+		}			
+		else if (this.fullscreen) { 
+			this.$ableWrapper.addClass('fullscreen');  
+			newWidth = $(window).width();			
+			// the 5 pixel buffer is arbitrary, but results in a better fit for all browsers
+			newHeight = $(window).height() - this.$playerDiv.outerHeight() - 5; 
+			this.positionCaptions('overlay');
+		}
+		else { // not fullscreen, and not first time initializing player 			
+			this.$ableWrapper.removeClass('fullscreen');
+			if (this.player === 'html5') { 
+				if (this.playerWidth) { 
+					newWidth = this.playerWidth; 
+				}
+				else {
+					// use full size of window 
+					// player will be downsized to fit container if CSS requires it 
+					newWidth = $(window).width();
+				}
+			}
+			else { 
+				newWidth = this.$ableWrapper.width(); 
+			}
+			newHeight = Math.round(newWidth * this.aspectRatio); 
+			this.positionCaptions(this.prefCaptionsPosition); 
+		}
+		if (this.debug) {
+			console.log('resizePlayer to ' + newWidth + 'x' + newHeight); 		
+		}
+		// Now size the player with newWidth and newHeight
+		if (this.player === 'youtube' || this.player === 'vimeo') { 
+			$iframe = this.$ableWrapper.find('iframe'); 
+			if (this.player === 'youtube' && this.youTubePlayer) { 
+				// alternatively, YouTube API offers a method for setting the video size 
+				// this adds width and height attributes to the iframe 
+				// but might have other effects, so best to do it this way 
+				this.youTubePlayer.setSize(newWidth,newHeight); 
+			}
+			else { 
+				// Vimeo API does not have a method for changing size of player 
+				// Therefore, need to change iframe attributes directly 
+				$iframe.attr({
+					'width': newWidth,
+					'height': newHeight
+				}); 
+			}
+			if (this.playerWidth && this.playerHeight) { 
+				if (this.fullscreen) { 
+					// remove constraints 
+					$iframe.css({ 
+						'max-width': '',
+						'max-height': ''
+					});	
+				}
+				else {
+					// use CSS on iframe to enforce explicitly defined size constraints
+					$iframe.css({ 
+						'max-width': this.playerWidth + 'px',
+						'max-height': this.playerHeight + 'px'
 					});
 				}
-				this.$media.css({
-					'width': '100%',
-					'height': 'auto'
-				});
 			}
 		}
-
-		// resize YouTube
-		if (this.player === 'youtube' && this.youTubePlayer) {
-			this.youTubePlayer.setSize(width, height);
+		else if (this.player === 'html5') { 
+			if (this.fullscreen) {
+				this.$media.attr({
+					'width': newWidth,
+					'height': newHeight
+				});
+				this.$ableWrapper.css({
+					'width': newWidth,
+					'height': newHeight
+				});
+			}
+			else { 
+				// No constraints. Let CSS handle the positioning. 
+				this.$media.removeAttr('width height');
+				this.$ableWrapper.css({
+					'width': newWidth + 'px',
+					'height': 'auto'
+				});
+			}				
 		}
-
 		// Resize captions
 		if (typeof this.$captionsDiv !== 'undefined') {
 
-			// Font-size is too small in full screen view & too large in small-width view
-			// The following vars define a somewhat arbitary zone outside of which
-			// caption size requires adjustment
-			captionSizeOkMin = 400;
-			captionSizeOkMax = 1000;
+			// Font-size is too small in full screen view 
+			// use viewport units (vw) instead
+			// % units work fine if not fullscreen  
+			// prefCaptionSize is expressed as a percentage 
 			captionSize = parseInt(this.prefCaptionsSize,10);
-
-			// TODO: Need a better formula so that it scales proportionally to viewport
-			if (width > captionSizeOkMax) {
-				newCaptionSize = captionSize * 1.5;
+			if (this.fullscreen) { 
+				captionSize = (captionSize / 100) + 'vw'; 
 			}
-			else if (width < captionSizeOkMin) {
-				newCaptionSize = captionSize / 1.5;
+			else { 
+				captionSize = captionSize + '%'; 
 			}
-			else {
-				newCaptionSize = captionSize;
-			}
-			newLineHeight = newCaptionSize + 25;
-			this.$captionsDiv.css('font-size',newCaptionSize + '%');
-			this.$captionsWrapper.css('line-height',newLineHeight + '%');
+			this.$captionsDiv.css({
+				'font-size': captionSize
+			});
 		}
-		this.refreshControls('captions');
+
+		// Reposition alert message (video player only)
+		// just below the vertical center of the mediaContainer
+		// hopefully above captions, but not too far from the controller bar		
+		if (this.mediaType === 'video') { 
+			alertTop = Math.round(this.$mediaContainer.height() / 3) * 2;			
+			this.$alertBox.css({
+				top: alertTop + 'px'
+			});
+		}
+
+		this.refreshControls();			
 	};
 
 	AblePlayer.prototype.retrieveOffscreenWindow = function( which, width, height ) {
@@ -1896,7 +2088,7 @@ var Cookies = require("js-cookie");
 		// This was a group decision based on the belief that users may want a transcript
 		// that is in a different language than the captions
 
-		var i, captions, descriptions, chapters, meta;
+		var i, captions, descriptions, chapters, meta, langHasChanged;
 
 		// Captions
 		for (i = 0; i < this.captions.length; i++) {
@@ -1922,10 +2114,8 @@ var Cookies = require("js-cookie");
 				meta = this.meta[i];
 			}
 		}
-
 		// regardless of source...
 		this.transcriptLang = language;
-
 		if (source === 'init' || source === 'captions') {
 			this.captionLang = language;
 			this.selectedCaptions = captions;
@@ -1945,6 +2135,20 @@ var Cookies = require("js-cookie");
 			this.transcriptCaptions = captions;
 			this.transcriptChapters = chapters;
 			this.transcriptDescriptions = descriptions;
+		}
+		if (this.selectedDescriptions) {
+			// updating description voice to match new description language			
+			this.setDescriptionVoice();			
+			if (this.$sampleDescDiv) { 
+				if (this.sampleText) { 
+					for (i = 0; i < this.sampleText.length; i++) { 
+						if (this.sampleText[i].lang === this.selectedDescriptions.language) { 
+							this.currentSampleText = this.sampleText[i]['text']; 
+							this.$sampleDescDiv.html(this.currentSampleText); 
+						}
+					}
+				}
+			}
 		}
 		this.updateTranscript();
 	};

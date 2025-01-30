@@ -16,7 +16,8 @@ var Cookies = require("js-cookie");
 		// There are nevertheless lessons to be learned from Drag & Drop about accessibility:
 		// http://dev.opera.com/articles/accessible-drag-and-drop/
 
-		var thisObj, $window, $toolbar, windowName, $resizeHandle, resizeZIndex;
+		var thisObj, $window, $toolbar, windowName, $resizeHandle, $resizeSvg, 
+			i, x1, y1, x2, y2, $resizeLine, resizeZIndex;
 
 		thisObj = this;
 
@@ -38,49 +39,90 @@ var Cookies = require("js-cookie");
 		$resizeHandle = $('<div>',{
 			'class': 'able-resizable'
 		});
+
+		// fill it with three parallel diagonal lines 
+		$resizeSvg = $('<svg>').attr({
+			'width': '100%',
+			'height': '100%',
+			'viewBox': '0 0 100 100',
+			'preserveAspectRatio': 'none'
+		});
+		for (i=1; i<=3; i++) { 
+			if (i === 1) { 
+				x1 = '100'; 
+				y1 = '0'; 
+				x2 = '0'; 
+				y2 = '100'; 
+			}
+			else if (i === 2) { 
+				x1 = '33'; 
+				y1 = '100'; 
+				x2 = '100'; 
+				y2 = '33'; 
+			}
+			else if (i === 3) { 
+				x1 = '67'; 
+				y1 = '100'; 
+				x2 = '100'; 
+				y2 = '67'; 
+			}
+			$resizeLine = $('<line>').attr({ 
+				'x1': x1,
+				'y1': y1,
+				'x2': x2,
+				'y2': y2,
+				'vector-effect': 'non-scaling-stroke'				
+			})
+			$resizeSvg.append($resizeLine); 
+		}
+		$resizeHandle.html($resizeSvg); 
+
 		// assign z-index that's slightly higher than parent window
 		resizeZIndex = parseInt($window.css('z-index')) + 100;
 		$resizeHandle.css('z-index',resizeZIndex);
 		$window.append($resizeHandle);
+
+		// Final step: Need to refresh the DOM in order for browser to process & display the SVG
+		$resizeHandle.html($resizeHandle.html());
 
 		// add event listener to toolbar to start and end drag
 		// other event listeners will be added when drag starts
 		$toolbar.on('mousedown mouseup touchstart touchend', function(e) {
 			e.stopPropagation();
 			if (e.type === 'mousedown' || e.type === 'touchstart') {
-  			if (!thisObj.windowMenuClickRegistered) {
-	  			thisObj.windowMenuClickRegistered = true;
-          thisObj.startMouseX = e.pageX;
-          thisObj.startMouseY = e.pageY;
-          thisObj.dragDevice = 'mouse'; // ok to use this even if device is a touchpad
-          thisObj.startDrag(which, $window);
-			  }
-      }
-      else if (e.type === 'mouseup' || e.type === 'touchend') {
-        if (thisObj.dragging && thisObj.dragDevice === 'mouse') {
-				  thisObj.endDrag(which);
-			  }
-      }
-      return false;
+				if (!thisObj.windowMenuClickRegistered) {
+					thisObj.windowMenuClickRegistered = true;
+					thisObj.startMouseX = e.pageX;
+					thisObj.startMouseY = e.pageY;
+					thisObj.dragDevice = 'mouse'; // ok to use this even if device is a touchpad
+					thisObj.startDrag(which, $window);
+				}
+			}
+			else if (e.type === 'mouseup' || e.type === 'touchend') {
+				if (thisObj.dragging && thisObj.dragDevice === 'mouse') {
+					thisObj.endDrag(which);
+				}
+			}
+			return false;
 		});
 
 		// add event listeners for resizing
 		$resizeHandle.on('mousedown mouseup touchstart touchend', function(e) {
 			e.stopPropagation();
 			if (e.type === 'mousedown' || e.type === 'touchstart') {
-  			if (!thisObj.windowMenuClickRegistered) {
-	  			thisObj.windowMenuClickRegistered = true;
-          thisObj.startMouseX = e.pageX;
-          thisObj.startMouseY = e.pageY;
-          thisObj.startResize(which, $window);
-			  }
-      }
-      else if (e.type === 'mouseup' || e.type === 'touchend') {
-  			if (thisObj.resizing) {
-	  			thisObj.endResize(which);
-        }
-      }
-      return false;
+				if (!thisObj.windowMenuClickRegistered) {
+					thisObj.windowMenuClickRegistered = true;
+					thisObj.startMouseX = e.pageX;
+					thisObj.startMouseY = e.pageY;
+					thisObj.startResize(which, $window);
+				}
+			}
+			else if (e.type === 'mouseup' || e.type === 'touchend') {
+				if (thisObj.resizing) {
+					thisObj.endResize(which);
+				}
+			}
+			return false;
 		});
 
 		// whenever a window is clicked, bring it to the foreground
@@ -131,6 +173,7 @@ var Cookies = require("js-cookie");
 			'aria-label': this.tt.windowButtonLabel,
 			'aria-haspopup': 'true',
 			'aria-controls': menuId,
+			'aria-expanded': 'false',
 			'class': 'able-button-handler-preferences'
 		});
 		if (this.iconType === 'font') {
@@ -202,14 +245,14 @@ var Cookies = require("js-cookie");
 		// handle button click
 		$newButton.on('click mousedown keydown',function(e) {
 
-      if (thisObj.focusNotClick) {
-        return false;
-      }
-      if (thisObj.dragging) {
+			if (thisObj.focusNotClick) {
+				return false;
+			}
+			if (thisObj.dragging) {
 				thisObj.dragKeys(which, e);
 				return false;
-		  }
-      e.stopPropagation();
+			}
+			e.stopPropagation();
 			if (!thisObj.windowMenuClickRegistered && !thisObj.finishingDrag) {
 				// don't set windowMenuClickRegistered yet; that happens in handler function
 				thisObj.handleWindowButtonClick(which, e);
@@ -318,7 +361,7 @@ var Cookies = require("js-cookie");
 		// that will include an ancestor of the dialog,
 		// which will render the dialog unreadable by screen readers
 		$('body').append($resizeForm);
-		resizeDialog = new AccessibleDialog($resizeForm, $windowButton, 'alert', this.tt.windowResizeHeading, $resizeWrapper, this.tt.closeButtonLabel, '20em');
+		resizeDialog = new AccessibleDialog($resizeForm, $windowButton, 'dialog', true, this.tt.windowResizeHeading, $resizeWrapper, this.tt.closeButtonLabel, '20em');
 		if (which === 'transcript') {
 			this.transcriptResizeDialog = resizeDialog;
 		}
@@ -334,10 +377,10 @@ var Cookies = require("js-cookie");
 		thisObj = this;
 
 		if (this.focusNotClick) {
-  		// transcript or sign window has just opened,
-  		// and focus moved to the window button
-  		// ignore the keystroke that triggered the popup
-  		return false;
+			// transcript or sign window has just opened,
+			// and focus moved to the window button
+			// ignore the keystroke that triggered the popup
+			return false;
 		}
 
 		if (which === 'transcript') {
@@ -358,25 +401,25 @@ var Cookies = require("js-cookie");
 				this.windowMenuClickRegistered = true;
 			}
 			else if (e.which === 27) { // escape
-        if ($windowPopup.is(':visible')) {
-  				// close the popup menu
-          $windowPopup.hide('fast', function() {
-					  // also reset the Boolean
-            thisObj.windowMenuClickRegistered = false;
-            // also restore menu items to their original state
-            $windowPopup.find('li').removeClass('able-focus').attr('tabindex','-1');
-            // also return focus to window options button
-            $windowButton.focus();
-				  });
+				if ($windowPopup.is(':visible')) {
+					// close the popup menu
+					$windowPopup.hide('fast', function() {
+						// also reset the Boolean
+						thisObj.windowMenuClickRegistered = false;
+						// also restore menu items to their original state
+						$windowPopup.find('li').removeClass('able-focus').attr('tabindex','-1');
+						// also return focus to window options button
+						$windowButton.focus();
+					});
 				}
 				else {
-  				// popup isn't open. Close the window
-          if (which === 'sign') {
-            this.handleSignToggle();
-          }
-          else if (which === 'transcript') {
-            this.handleTranscriptToggle();
-          }
+					// popup isn't open. Close the window
+					if (which === 'sign') {
+						this.handleSignToggle();
+					}
+					else if (which === 'transcript') {
+						this.handleTranscriptToggle();
+					}
 				}
 			}
 			else {
@@ -435,6 +478,7 @@ var Cookies = require("js-cookie");
 					thisObj.windowMenuClickRegistered = false;
 					// also restore menu items to their original state
 					$windowPopup.find('li').removeClass('able-focus').attr('tabindex','-1');
+					$windowButton.attr('aria-expanded','false');
 					// also return focus to window options button
 					$windowButton.focus();
 				});
@@ -442,9 +486,9 @@ var Cookies = require("js-cookie");
 			}
 			else {
 				// all other keys will be handled by upstream functions
-        if (choice !== 'close') {
-          this.$activeWindow = $window;
-		    }
+				if (choice !== 'close') {
+					this.$activeWindow = $window;
+				}
 				return false;
 			}
 		}
@@ -455,15 +499,16 @@ var Cookies = require("js-cookie");
 			thisObj.windowMenuClickRegistered = false;
 			// also restore menu items to their original state
 			$windowPopup.find('li').removeClass('able-focus').attr('tabindex','-1');
+			$windowButton.attr('aria-expanded','false');
 		});
 		if (choice !== 'close') {
 			$windowButton.focus();
 		}
 		if (choice === 'move') {
 
-      // temporarily add role="application" to activeWindow
-      // otherwise, screen readers incercept arrow keys and moving window will not work
-      this.$activeWindow.attr('role','application');
+			// temporarily add role="application" to activeWindow
+			// otherwise, screen readers incercept arrow keys and moving window will not work
+			this.$activeWindow.attr('role','application');
 
 			if (!this.showedAlert(which)) {
 				this.showAlert(this.tt.windowMoveAlert,which);
@@ -485,22 +530,22 @@ var Cookies = require("js-cookie");
 		}
 		else if (choice == 'resize') {
 			// resize through the menu uses a form, not drag
-      var resizeFields = resizeDialog.getInputs();
-      if (resizeFields) {
-        // reset width and height values in form
-        resizeFields[0].value = $window.width();
-        resizeFields[1].value = $window.height();
-      }
+			var resizeFields = resizeDialog.getInputs();
+			if (resizeFields) {
+				// reset width and height values in form
+				resizeFields[0].value = $window.width();
+				resizeFields[1].value = $window.height();
+			}
 			resizeDialog.show();
 		}
 		else if (choice == 'close') {
 			// close window, place focus on corresponding button on controller bar
 			if (which === 'transcript') {
-        this.closingTranscript = true; // stopgrap to prevent double-firing of keypress
+				this.closingTranscript = true; // stopgrap to prevent double-firing of keypress
 				this.handleTranscriptToggle();
 			}
 			else if (which === 'sign') {
-        this.closingSign = true; // stopgrap to prevent double-firing of keypress
+				this.closingSign = true; // stopgrap to prevent double-firing of keypress
 				this.handleSignToggle();
 			}
 		}
@@ -512,10 +557,10 @@ var Cookies = require("js-cookie");
 
 		thisObj = this;
 
-    if (!this.$activeWindow) {
-  		this.$activeWindow = $element;
-    }
-    this.dragging = true;
+		if (!this.$activeWindow) {
+			this.$activeWindow = $element;
+		}
+		this.dragging = true;
 
 		if (which === 'transcript') {
 			$windowPopup = this.$transcriptPopup;
@@ -665,7 +710,7 @@ var Cookies = require("js-cookie");
 	AblePlayer.prototype.endDrag = function(which) {
 
 		var thisObj, $window, $windowPopup, $windowButton;
-    thisObj = this;
+		thisObj = this;
 
 		if (which === 'transcript') {
 			$windowPopup = this.$transcriptPopup;

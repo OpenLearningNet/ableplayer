@@ -74,11 +74,11 @@ exports.strings = {
 
 "preferences": "Seçenekler",
 
-"enterFullScreen": "Tam Ekranı Etkinleştir",
+"enterFullscreen": "Tam Ekranı Etkinleştir",
 
-"exitFullScreen": "Tam Ekranı Kapa",
+"exitFullscreen": "Tam Ekranı Kapa",
 
-"fullScreen": "Tam Ekran",
+"fullscreen": "Tam Ekran",
 
 "speed": "Hız",
 
@@ -204,7 +204,25 @@ exports.strings = {
 
 "prefDescPause": "Açıklama başladığında video'yu otomatik olarak durdur",
 
-"prefVisibleDesc": "Açıklamayı görünür yap",
+"prefDescVisible": "Açıklamayı görünür yap",
+
+"prefDescVoice": "Voice",
+
+"prefDescRate": "Rate",
+
+"prefDescPitch": "Pitch",
+
+"prefDescPitch1": "Very low",
+
+"prefDescPitch2": "Low",
+
+"prefDescPitch3": "Default",
+
+"prefDescPitch4": "High",
+
+"prefDescPitch5": "Very high",
+
+"sampleDescriptionText": "Adjust settings to hear this sample text.",
 
 "prefHighlight": "Medya'daki belgeyi öne çıkar",
 
