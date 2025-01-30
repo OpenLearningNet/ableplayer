@@ -680,11 +680,124 @@ exports.AblePlayer = window.AblePlayer;
 
 var jQuery = require("jquery");
 var Cookies = require("js-cookie");
+var icons = {
+  "volume-soft": {
+    white: require('../button-icons/white/volume-soft.png'),
+    black: require('../button-icons/black/volume-soft.png')
+  },
+  'volume-mute': {
+    white: require('../button-icons/white/volume-mute.png'),
+    black: require('../button-icons/black/volume-mute.png')
+  },
+  'volume-medium': {
+    white: require('../button-icons/white/volume-medium.png'),
+    black: require('../button-icons/black/volume-medium.png')
+  },
+  'volume-loud': {
+    white: require('../button-icons/white/volume-loud.png'),
+    black: require('../button-icons/black/volume-loud.png')
+  },
+  turtle: {
+    white: require('../button-icons/white/turtle.png'),
+    black: require('../button-icons/black/turtle.png')
+  },
+  transcript: {
+    white: require('../button-icons/white/transcript.png'),
+    black: require('../button-icons/black/transcript.png')
+  },
+  stop: {
+    white: require('../button-icons/white/stop.png'),
+    black: require('../button-icons/black/stop.png')
+  },
+  slower: {
+    white: require('../button-icons/white/slower.png'),
+    black: require('../button-icons/black/slower.png')
+  },
+  sign: {
+    white: require('../button-icons/white/sign.png'),
+    black: require('../button-icons/black/sign.png')
+  },
+  rewind: {
+    white: require('../button-icons/white/rewind.png'),
+    black: require('../button-icons/black/rewind.png')
+  },
+  restart: {
+    white: require('../button-icons/white/restart.png'),
+    black: require('../button-icons/black/restart.png')
+  },
+  rabbit: {
+    white: require('../button-icons/white/rabbit.png'),
+    black: require('../button-icons/black/rabbit.png')
+  },
+  previous: {
+    white: require('../button-icons/white/previous.png'),
+    black: require('../button-icons/black/previous.png')
+  },
+  preferences: {
+    white: require('../button-icons/white/preferences.png'),
+    black: require('../button-icons/black/preferences.png')
+  },
+  play: {
+    white: require('../button-icons/white/play.png'),
+    black: require('../button-icons/black/play.png')
+  },
+  pipe: {
+    white: require('../button-icons/white/pipe.png'),
+    black: require('../button-icons/black/pipe.png')
+  },
+  pause: {
+    white: require('../button-icons/white/pause.png'),
+    black: require('../button-icons/black/pause.png')
+  },
+  next: {
+    white: require('../button-icons/white/next.png'),
+    black: require('../button-icons/black/next.png')
+  },
+  help: {
+    white: require('../button-icons/white/help.png'),
+    black: require('../button-icons/black/help.png')
+  },
+  'fullscreen-expand': {
+    white: require('../button-icons/white/fullscreen-expand.png'),
+    black: require('../button-icons/black/fullscreen-expand.png')
+  },
+  'fullscreen-collapse': {
+    white: require('../button-icons/white/fullscreen-collapse.png'),
+    black: require('../button-icons/black/fullscreen-collapse.png')
+  },
+  forward: {
+    white: require('../button-icons/white/forward.png'),
+    black: require('../button-icons/black/forward.png')
+  },
+  faster: {
+    white: require('../button-icons/white/faster.png'),
+    black: require('../button-icons/black/faster.png')
+  },
+  ellipsis: {
+    white: require('../button-icons/white/ellipsis.png'),
+    black: require('../button-icons/black/ellipsis.png')
+  },
+  descriptions: {
+    white: require('../button-icons/white/descriptions.png'),
+    black: require('../button-icons/black/descriptions.png')
+  },
+  close: {
+    white: require('../button-icons/white/close.png'),
+    black: require('../button-icons/black/close.png')
+  },
+  chapters: {
+    white: require('../button-icons/white/chapters.png'),
+    black: require('../button-icons/black/chapters.png')
+  },
+  captions: {
+    white: require('../button-icons/white/captions.png'),
+    black: require('../button-icons/black/captions.png')
+  }
+};
 
 (function ($) {
 	// Set default variable values.
 	AblePlayer.prototype.setDefaults = function () {
-
 		this.playerCreated = false; // will set to true after recreatePlayer() is complete the first time
 		this.playing = false; // will change to true after 'playing' event is triggered
 		this.paused = true; // will always be the opposite of this.playing (available for convenience)
@@ -698,6 +811,22 @@ var Cookies = require("js-cookie");
 
 		this.setIconColor();
 		this.setButtonImages();
+	};
+
+	AblePlayer.prototype.getIcon = function (icon, type) {
+		var color = 'white';
+
+		if (type === 'toolbar') {
+			color = this.toolbarIconColor;
+		} else {
+			color = this.iconColor;
+		}
+
+		if (icons[icon] === undefined) {
+			return '';
+		}
+
+		return icons[icon][color].default;
 	};
 
 	AblePlayer.prototype.setIconColor = function() {
@@ -755,37 +884,31 @@ var Cookies = require("js-cookie");
 	AblePlayer.prototype.setButtonImages = function() {
 
 		// NOTE: volume button images are now set dynamically within volume.js
-		this.playButtonImg = require('../button-icons/' + this.iconColor + '/' + 'play.png');
-		this.pauseButtonImg = require('../button-icons/' + this.iconColor + '/' + 'pause.png');
-
-		this.restartButtonImg = require('../button-icons/' + this.iconColor + '/' + 'restart.png');
-
-		this.rewindButtonImg = require('../button-icons/' + this.iconColor + '/' + 'rewind.png');
-		this.forwardButtonImg = require('../button-icons/' + this.iconColor + '/' + 'forward.png');
-
-		this.previousButtonImg = require('../button-icons/' + this.iconColor + '/' + 'previous.png');
-		this.nextButtonImg = require('../button-icons/' + this.iconColor + '/' + 'next.png');
-
+		this.playButtonImg = this.getIcon('play');
+		this.pauseButtonImg = this.getIcon('pause');
+		this.restartButtonImg = this.getIcon('restart');
+		this.rewindButtonImg = this.getIcon('rewind');
+		this.forwardButtonImg = this.getIcon('forward');
+		this.previousButtonImg = this.getIcon('previous');
+		this.nextButtonImg = this.getIcon('next');
+		
 		if (this.speedIcons === 'arrows') {
-			this.fasterButtonImg = require('../button-icons/' + this.iconColor + '/' + 'slower.png');
-			this.slowerButtonImg = require('../button-icons/' + this.iconColor + '/' + 'faster.png');
+				this.fasterButtonImg = this.getIcon('slower');
+				this.slowerButtonImg = this.getIcon('faster');
+		} else if (this.speedIcons === 'animals') {
+				this.fasterButtonImg = this.getIcon('rabbit');
+				this.slowerButtonImg = this.getIcon('turtle');
 		}
-		else if (this.speedIcons === 'animals') {
-			this.fasterButtonImg = require('../button-icons/' + this.iconColor + '/' + 'rabbit.png');
-			this.slowerButtonImg = require('../button-icons/' + this.iconColor + '/' + 'turtle.png');
-		}
-
-		this.captionsButtonImg = require('../button-icons/' + this.iconColor + '/' + 'captions.png');
-		this.chaptersButtonImg = require('../button-icons/' + this.iconColor + '/' + 'chapters.png');
-		this.signButtonImg = require('../button-icons/' + this.iconColor + '/' + 'sign.png');
-		this.transcriptButtonImg = require('../button-icons/' + this.iconColor + '/' + 'transcript.png');
-		this.descriptionsButtonImg = require('../button-icons/' + this.iconColor + '/' + 'descriptions.png');
-
-		this.fullscreenExpandButtonImg = require('../button-icons/' + this.iconColor + '/' + 'fullscreen-expand.png');
-		this.fullscreenCollapseButtonImg = require('../button-icons/' + this.iconColor + '/' + 'fullscreen-collapse.png');
-
-		this.prefsButtonImg = require('../button-icons/' + this.iconColor + '/' + 'preferences.png');
-		this.helpButtonImg = require('../button-icons/' + this.iconColor + '/' + 'help.png');
+		
+		this.captionsButtonImg = this.getIcon('captions');
+		this.chaptersButtonImg = this.getIcon('chapters');
+		this.signButtonImg = this.getIcon('sign');
+		this.transcriptButtonImg = this.getIcon('transcript');
+		this.descriptionsButtonImg = this.getIcon('descriptions');
+		this.fullscreenExpandButtonImg = this.getIcon('fullscreen-expand');
+		this.fullscreenCollapseButtonImg = this.getIcon('fullscreen-collapse');
+		this.prefsButtonImg = this.getIcon('preferences');
+		this.helpButtonImg = this.getIcon('help');
 	};
 
 	AblePlayer.prototype.getSvgData = function(button) {
@@ -4617,8 +4740,9 @@ var Cookies = require("js-cookie");
 						$pipe.addClass('icon-pipe');
 					}
 					else {
+						var pipeIcon = this.getIcon('pipe');
 						$pipeImg = $('<img>', {
-							src: require('../button-icons/' +  this.iconColor + '/pipe.png'),
+							src: pipeIcon,
 							alt: '',
 							role: 'presentation'
 						});
@@ -4629,29 +4753,29 @@ var Cookies = require("js-cookie");
 				else {
 					// this control is a button
 					if (control === 'volume') {
-						buttonImgSrc = require('../button-icons/' + this.iconColor + '/' + this.volumeButton + '.png');
+						buttonImgSrc = this.getIcon(this.volumeButton);
 					}
 					else if (control === 'fullscreen') {
-						buttonImgSrc = require('../button-icons/' + this.iconColor + '/fullscreen-expand.png');
+						buttonImgSrc = this.getIcon('fullscreen-expand');
 					}
 					else if (control === 'slower') {
 						if (this.speedIcons === 'animals') {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/turtle.png');
+							buttonImgSrc = this.getIcon('turtle');
 						}
 						else {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/slower.png');
+							buttonImgSrc = this.getIcon('slower');
 						}
 					}
 					else if (control === 'faster') {
 						if (this.speedIcons === 'animals') {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/rabbit.png');
+							buttonImgSrc = this.getIcon('rabbit');
 						}
 						else {
-							buttonImgSrc = require('../button-icons/' + this.iconColor + '/faster.png');
+							buttonImgSrc = this.getIcon('faster');
 						}
 					}
 					else {
-						buttonImgSrc = require('../button-icons/' + this.iconColor + '/' + control + '.png');
+						buttonImgSrc = this.getIcon(control);
 					}
 					buttonTitle = this.getButtonTitle(control);
 
@@ -13533,7 +13657,7 @@ var Cookies = require("js-cookie");
 		}
 		else {
 			// use image
-			buttonImgSrc = require('../button-icons/' + this.toolbarIconColor + '/preferences.png');
+			buttonImagSrc = this.getIcon('preferences', 'toolbar');
 			$buttonImg = $('<img>',{
 				'src': buttonImgSrc,
 				'alt': '',
@@ -15309,6 +15433,26 @@ var jQuery = require("jquery");
 
 })(jQuery);
 var jQuery = require("jquery");
+var translationFiles = {
+	"ca": require("../translations/ca.js"),
+	"cs": require("../translations/cs.js"),
+	"da": require("../translations/da.js"),
+	"de": require("../translations/de.js"),
+	"en": require("../translations/en.js"),
+	"es": require("../translations/es.js"),
+	"fr": require("../translations/fr.js"),
+	"he": require("../translations/he.js"),
+	"id": require("../translations/id.js"),
+	"it": require("../translations/it.js"),
+	"ja": require("../translations/ja.js"),
+	"nb": require("../translations/nb.js"),
+	"nl": require("../translations/nl.js"),
+	"pt": require("../translations/pt.js"),
+	"pt-br": require("../translations/pt-br.js"),
+	"sv": require("../translations/sv.js"),
+	"tr": require("../translations/tr.js"),
+	"zh-tw": require("../translations/zh-tw.js")
+};
 
 (function ($) {
 	AblePlayer.prototype.getSupportedLangs = function() {
@@ -15316,6 +15460,17 @@ var jQuery = require("jquery");
 		var langs = ['ca','cs','da','de','en','es','fr','he','id','it','ja','nb','nl','pt','pt-br','sv','tr','zh-tw'];
 		return langs;
 	};
+
+	AblePlayer.prototype.getTranslationFile = function(language) {
+		// returns the translation file for the specified language
+		var lang = language || this.lang;
+		if (lang && translationFiles[lang]) {
+			return translationFiles[lang];
+		}
+		else {
+			return translationFiles['en'];
+		}
+	}
 
 	AblePlayer.prototype.getTranslationText = function() {
 
@@ -15404,10 +15559,10 @@ var jQuery = require("jquery");
 		if (!this.searchLang) {
 			this.searchLang = this.lang;
 		}
-		import("../translations/" + this.lang + ".js").then(function (translationFile) {
-			thisObj.tt = translationFile.strings;
-			deferred.resolve();
-		});
+		translationFile = this.getTranslationFile();
+		this.tt = translationFile.strings;
+		deferred.resolve();
+		
 		return deferred.promise();
 	};
 
@@ -15418,17 +15573,16 @@ var jQuery = require("jquery");
 		// in the Description Preferences dialog 
 		var thisObj, supportedLangs, i, thisLang, translationFile, thisText, translation; 
 		
-		supportedLangs = this.getSupportedLangs(); 
+		supportedLangs = this.getSupportedLangs() 
 
 		thisObj = this; 
 
 		this.sampleText = []; 
 		for (i=0; i < supportedLangs.length; i++) { 
-			import("../translations/" + supportedLangs[i] + ".js").then(function (translationFile) {
-				thisText = translationFile.strings.sampleDescriptionText;
-				translation = {'lang':supportedLangs[i], 'text': thisText}; 
-				thisObj.sampleText.push(translation); 						
-			});
+			translationFile = this.getTranslationFile(supportedLangs[i]);
+			thisText = translationFile.strings.sampleDescriptionText;
+			translation = {'lang':supportedLangs[i], 'text': thisText};
+			thisObj.sampleText.push(translation);
 		}
 	};
 
