@@ -13657,7 +13657,7 @@ var Cookies = require("js-cookie");
 		}
 		else {
 			// use image
-			buttonImagSrc = this.getIcon('preferences', 'toolbar');
+			buttonImgSrc = this.getIcon('preferences', 'toolbar');
 			$buttonImg = $('<img>',{
 				'src': buttonImgSrc,
 				'alt': '',
